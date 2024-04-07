@@ -1,0 +1,33 @@
+{
+  "name": "trovu-cli",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "npx tsc && chmod +x dist/cli/trovu.js",
+    "build-watch": "npx tsc --watch",
+    "test": "npx jest --verbose src/",
+    "coverage": "npx jest --verbose --coverage src/",
+    "lint": "npx eslint src/"
+  },
+  "type": "module",
+  "bin": {
+    "trovu": "dist/cli/trovu.js"
+  },
+  "author": "Stefan Schramm <mail@stefanschramm.net>",
+  "license": "AGPL-3.0-or-later",
+  "devDependencies": {
+    "@babel/preset-typescript": "^7.24.1",
+    "@types/jest": "^29.5.12",
+    "@types/node": "^20.12.2",
+    "eslint": "^8.57.0",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.1.2",
+    "typescript": "^5.4.4",
+    "typescript-eslint": "^7.5.0"
+  },
+  "dependencies": {
+    "ci": "^2.3.0",
+    "yaml": "^2.4.1"
+  }
+}
