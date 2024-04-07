@@ -14,23 +14,22 @@ test('getShortcutDatabaseByNamespaces', () => {
   });
 });
 
-test('getShortcutDatabaseByNamespaces throws exception on malformed yaml', () => {
-  const factory = getFactory();
+test('getShortcut on database throws exception for malformed yaml', () => {
+  const database = getFactory().getShortcutDatabaseByNamespaces(['malformedyaml']);
 
-  expect(() => factory.getShortcutDatabaseByNamespaces(['malformedyaml'])).toThrow(DataDefinitionError);
+  expect(() => database.getShortcut('b', 1, 'de')).toThrow(DataDefinitionError);
 });
 
-test('getShortcutDatabaseByNamespaces throws exception on error exception', () => {
-  const factory = getFactory();
+test('getShortcut on database throws exception on error exception', () => {
+  const database = getFactory().getShortcutDatabaseByNamespaces(['notfound']);
 
-  expect(() => factory.getShortcutDatabaseByNamespaces(['notfound'])).toThrow(UsageError);
+  expect(() => database.getShortcut('b', 1, 'de')).toThrow(UsageError);
 });
 
+test('getShortcut on database throws exception on non-error loading exception', () => {
+  const database = getFactory().getShortcutDatabaseByNamespaces(['notfound2']);
 
-test('getShortcutDatabaseByNamespaces throws exception on non-error loading exception', () => {
-  const factory = getFactory();
-
-  expect(() => factory.getShortcutDatabaseByNamespaces(['notfound2'])).toThrow(UsageError);
+  expect(() => database.getShortcut('b', 1, 'de')).toThrow(UsageError);
 });
 
 function getFactory() {

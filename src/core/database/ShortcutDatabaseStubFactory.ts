@@ -30,6 +30,14 @@ class ShortcutDatabaseStub implements ShortcutDatabase {
       }
     }
 
+    if (keyword === 'noalterantive' && argumentCount === 2) {
+      return {
+        deprecated: {
+          created: '2024-03-31',
+        }
+      }
+    }
+
     if (keyword === 'invalidalternative' && argumentCount === 2) {
       return {
         deprecated: {
@@ -39,6 +47,12 @@ class ShortcutDatabaseStub implements ShortcutDatabase {
           created: '2024-03-31',
         }
       }
+    }
+
+    if (keyword === 'resultmissingurl' && argumentCount === 2) {
+      return {
+        title: 'Result with missing URL',
+      };
     }
 
     return undefined;

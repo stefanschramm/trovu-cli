@@ -1,8 +1,8 @@
 import { type Environment } from './Environment.js';
-import { Shortcut, ShortcutDatabaseFactory } from './database/Shortcut.js';
+import { ShortcutDatabaseFactory } from './database/Shortcut.js';
 import { QueryParser } from './QueryParser.js';
 import { UrlProcessor } from './url/UrlProcessor.js';
-import { DataDefinitionError, ImplementationError } from '../Error.js';
+import { DataDefinitionError } from '../Error.js';
 
 export class QueryProcessor {
   constructor (
@@ -26,40 +26,36 @@ export class QueryProcessor {
 
     const shortcut = database.getShortcut(parsedQuery.keyword, parsedQuery.args.length, language);
 
-    const resultStatus = determineResultStatus(shortcut);
+    // const resultStatus = determineResultStatus(shortcut);
 
-    switch (resultStatus) {
-      case QueryProcessingResultStatus.NotFound:
-        return {
-          status: resultStatus
-        };
-
-      case QueryProcessingResultStatus.Deprecated:
-        return {
-          status: resultStatus,
-          deprecated: {
-            created: shortcut?.deprecated?.created,
-            alternativeQuery: determineDeprecationAlternative(shortcut?.deprecated?.alternative?.query, parsedQuery.args),
-          }
-        };
-
-      case QueryProcessingResultStatus.Success:
-      {
-        if (shortcut?.url === undefined) {
-          throw new ImplementationError('shortcut?.url was undefined after checking ');
-        }
-    
-        const urlProcessor = new UrlProcessor(language);
-    
-        const targetUrl = urlProcessor.process(shortcut.url, parsedQuery.args);
-    
-        return {
-          status: QueryProcessingResultStatus.Success,
-          url: targetUrl,
-        };
-      }
+    if (shortcut === undefined) {
+      return {status: QueryProcessingResultStatus.NotFound};
     }
-    // unreachable
+
+    if (shortcut.deprecated !== undefined) {
+      return {
+        status: QueryProcessingResultStatus.Deprecated,
+        deprecated: {
+          created: shortcut?.deprecated?.created,
+          alternativeQuery: determineDeprecationAlternative(shortcut?.deprecated?.alternative?.query, parsedQuery.args),
+        }
+      };
+    }
+
+    // success
+
+    if (shortcut?.url === undefined) {
+      throw new DataDefinitionError('shortcut?.url was undefined although the result was not deprecated!?');
+    }
+
+    const urlProcessor = new UrlProcessor(language);
+
+    const targetUrl = urlProcessor.process(shortcut.url, parsedQuery.args);
+
+    return {
+      status: QueryProcessingResultStatus.Success,
+      url: targetUrl,
+    };
   }
 }
 
@@ -77,17 +73,6 @@ export enum QueryProcessingResultStatus {
   Deprecated,
   NotFound,
   // TODO: Are there more result states?
-}
-
-function determineResultStatus(shortcut: Shortcut | undefined): QueryProcessingResultStatus {
-  if (shortcut === undefined) {
-    return QueryProcessingResultStatus.NotFound;
-  }
-  if (shortcut.deprecated !== undefined) {
-    return QueryProcessingResultStatus.Deprecated;
-  }
-
-  return QueryProcessingResultStatus.Success;
 }
 
 function determineDeprecationAlternative(alternative: string | undefined, args: string[]): string | undefined {

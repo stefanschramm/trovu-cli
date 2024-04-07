@@ -20,9 +20,9 @@ function main(): void {
   // --show - Display detailed information about a shortcut
   // --output - Just output URL, don't open browser
 
-  // Use all following args to make usage of quotes unnecessary
-  // TODO: Not sure if it's good to use all following args
   try {
+    // Use all following args to make usage of quotes unnecessary
+    // TODO: Not sure if it's good to use all following args
     const query = process.argv.slice(2).join(' ');
 
     const cliConfig = getCliConfig();
@@ -69,7 +69,7 @@ function main(): void {
     if (e instanceof TrovuError) {
       console.error(`Error while processing query: ${e.message}`);
     } else {
-      console.log(e); // show stack trace for unexpected errors
+      console.error(e); // show stack trace for unexpected errors
     }
   }
 }

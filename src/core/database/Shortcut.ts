@@ -3,11 +3,9 @@ export type Shortcut = {
   readonly url?: string,
   readonly title?: string,
   /** The include property is not readonly because we remove it while processing. */
-  include?: {
-    readonly key: string,
-  },
+  include?: IncludeDefinition,
   readonly deprecated?: {
-    readonly alternative: {
+    readonly alternative?: {
       readonly query: string,
     },
     readonly created: string,
@@ -33,9 +31,21 @@ export interface ShortcutDatabase {
 
 export interface ShortcutDatabaseFactory {
   /**
-   * Returns ShortcutDatabase containing only the data for the specified namespaces.
+   * Returns ShortcutDatabase for the specified namespaces.
    * 
    * The order of namespaces is important for prioritization.
    **/
   getShortcutDatabaseByNamespaces(namespaces: string[]): ShortcutDatabase;
 }
+
+
+export type IncludeDefinition  = SimpleIncludeDefinition | NamespaceIncludeDefinition[];
+
+type SimpleIncludeDefinition = {
+  readonly key: string,
+};
+
+type NamespaceIncludeDefinition = {
+  readonly key: string,
+  readonly namespace: string,
+};

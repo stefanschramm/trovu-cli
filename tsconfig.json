@@ -19,7 +19,7 @@
 
     "exactOptionalPropertyTypes": true,
     "useDefineForClassFields": true,
-    "declaration": true,
+    "declaration": true
   }
 }
 

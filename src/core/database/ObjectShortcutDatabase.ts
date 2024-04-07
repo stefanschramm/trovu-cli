@@ -1,16 +1,24 @@
 import { DataDefinitionError } from '../../Error.js';
-import { Shortcut, ShortcutDatabase } from './Shortcut.js';
+import { IncludeDefinition, Shortcut, ShortcutDatabase } from './Shortcut.js';
 
+export interface NamespaceDataProvider {
+  /** Get map of shortcuts (by search key) for specified namespace */
+  get(namespace: string): Record<string, Shortcut>;
+}
+
+/**
+ * Shortcut database that is based on a hierarchy of JavaScript objects grouped by namespaces (classical Trovu YAML data)
+ */
 export class ObjectShortcutDatabase implements ShortcutDatabase {
   constructor(
     /** List of namespaces ordered by decending priority */
-    private readonly database: Record<string, Shortcut>[],
-    private readonly loadedNamespaces: string[],
+    private readonly namespaces: string[],
+    private readonly namespaceDataProvider: NamespaceDataProvider,
   ) {}
 
   public getShortcut(keyword: string, argumentCount: number, language: string): Shortcut | undefined {
     const searchKey = `${keyword} ${argumentCount}`;
-    const finder = new ShortcutFinder(this.database, this.loadedNamespaces, language)
+    const finder = new ShortcutFinder(this.namespaces, this.namespaceDataProvider, language)
 
     return finder.getShortcutBySearchKey(searchKey);
   }
@@ -18,34 +26,39 @@ export class ObjectShortcutDatabase implements ShortcutDatabase {
 
 class ShortcutFinder {
   public constructor(
-    private readonly database: Record<string, Shortcut>[],
-    private readonly loadedNamespaces: string[],
+    private readonly namespaces: string[],
+    private readonly namespaceDataProvider: NamespaceDataProvider,
     /** Language to use when replacing search keys of includes */
     private readonly language: string,
   ) {}
 
-  public getShortcutBySearchKey(searchKey: string, maxDepth = 10): Shortcut | undefined {
+  public getShortcutBySearchKey(searchKey: string, overrideNamespaces: string[] | undefined = undefined, maxDepth = 10): Shortcut | undefined {
     if (maxDepth <= 0) {
       throw new DataDefinitionError(`Possible circular inclusion detected for searchKey "${searchKey}".`);
     }
-    for (const namespaceData of this.database) {
-      let shortcut = namespaceData[searchKey];
+
+    const namespacesToSearchIn = overrideNamespaces === undefined ? this.namespaces : overrideNamespaces;
+
+    for (const namespace of namespacesToSearchIn) {
+      let shortcut = this.namespaceDataProvider.get(namespace)[searchKey];
       if (shortcut === undefined) {
         continue; // look in next namespace
       }
-      // TODO: add support for "short notation" where shortcut is just a string instead of an object ("examplekeyword 1: http://www.example.com/?q=<param1>")
+
       if (shortcut.include !== undefined) {
-        const referencedShortcutSearchKey = this.determineReferencedShortcutSearchKey(shortcut.include);
-        const referencedShortcut = this.getShortcutBySearchKey(referencedShortcutSearchKey, --maxDepth);
-        if (referencedShortcut === undefined) {
-          throw new DataDefinitionError(`Included shortcut "${referencedShortcutSearchKey}" was not found.`);
+        const includedShortcut = this.getShortcutByIncludeDefinition(shortcut.include, overrideNamespaces, --maxDepth);
+        if (includedShortcut === undefined) {
+          // We don't return partial shortcuts (for example title without url would be useless).
+          return undefined;
         }
         delete(shortcut['include']);
         shortcut = {
-          ...referencedShortcut,
+          ...includedShortcut,
           ...shortcut,
         };
       }
+
+      // TODO: add support for "short notation" where shortcut is just a string instead of an object ("examplekeyword 1: http://www.example.com/?q=<param1>") - it should be mapped to match the Shortcut type
 
       return shortcut;
     }
@@ -53,44 +66,30 @@ class ShortcutFinder {
     return undefined; // keyword not found
   }
 
-  private determineReferencedShortcutSearchKey(include: IncludeDefinition): string {
-    let searchKey: string;
+  private getShortcutByIncludeDefinition(include: IncludeDefinition, overrideNamespaces: string[] | undefined, maxDepth = 10): Shortcut | undefined {
     if (include instanceof Array) {
-      const includesMatchingAvailableNamespaces = include.filter((include: NamespaceIncludeDefinition) => this.loadedNamespaces.includes(include.namespace));
-
-      if (includesMatchingAvailableNamespaces.length === 0) {
-        const missingNamespaces = include.map((include) => include.namespace);
-        throw new DataDefinitionError(`Unable to find any matching namespace for includes. Add one of the following namespaces to your environment or query: ${missingNamespaces.join(', ')}`);
+      // List of references by namespace - namespace to search in comes from include, not from usual namespace priority list
+      for (const includeEntry of include) {
+        const referencedShortcut = this.getShortcutBySearchKey(this.mapSearchKey(includeEntry.key), [includeEntry.namespace], maxDepth);
+        if (referencedShortcut !== undefined) {
+          return referencedShortcut;
+        }
+      }
+      // This path may result in undefined - for example when there is no dictionary for a specific translation direction.
+      return undefined;
+    } else {
+      // One single shortcut
+      const referencedShortcut = this.getShortcutBySearchKey(this.mapSearchKey(include.key), overrideNamespaces, maxDepth);
+      if (referencedShortcut === undefined) {
+        // TODO: Not quite sure about the semantics. Does it mean it's included from the same namespace? - Then an exception is correct. Otherwise we should just ignore it.
+        throw new DataDefinitionError(`Shortcut with include key "${include.key}" was not found.`);
       }
 
-      /**
-       * TODO
-       * The priority for the namespace is determined by the include-list of the shortcut, not the normal namespace priority.
-       * We need to dynamically load the other individual namespace YAMLs.
-       * The shortcut database therefore needs to keep a map which data came from which namespace (and if it already has been loaded).
-       */
-
-      /**
-       * TODO
-       * Shall we have special handling for the condition (includesMatchingAvailableNamespaces.length > 1)
-       * ...in case there are multiple includes with different search keys?
-       */
-
-      searchKey = includesMatchingAvailableNamespaces[0].key;
-    } else {
-      // simple single include
-      searchKey = include.key;
+      return referencedShortcut;
     }
+  }
 
-    searchKey = searchKey.replace('<$language>', this.language);
-
-    return searchKey; 
+  private mapSearchKey(searchKey: string): string {
+    return searchKey.replace('<$language>', this.language);
   }
 }
-
-type IncludeDefinition  = {key: string} | NamespaceIncludeDefinition[];
-
-type NamespaceIncludeDefinition = {
-  key: string,
-  namespace: string,
-};
