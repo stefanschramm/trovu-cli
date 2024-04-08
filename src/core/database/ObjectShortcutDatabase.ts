@@ -75,17 +75,10 @@ class ShortcutFinder {
           return referencedShortcut;
         }
       }
-      // This path may result in undefined - for example when there is no dictionary for a specific translation direction.
       return undefined;
     } else {
       // One single shortcut
-      const referencedShortcut = this.getShortcutBySearchKey(this.mapSearchKey(include.key), overrideNamespaces, maxDepth);
-      if (referencedShortcut === undefined) {
-        // TODO: Not quite sure about the semantics. Does it mean it's included from the same namespace? - Then an exception is correct. Otherwise we should just ignore it.
-        throw new DataDefinitionError(`Shortcut with include key "${include.key}" was not found.`);
-      }
-
-      return referencedShortcut;
+      return this.getShortcutBySearchKey(this.mapSearchKey(include.key), overrideNamespaces, maxDepth);
     }
   }
 

@@ -118,22 +118,6 @@ test('getShortcut processes include list attribute and returns undefined if incl
   expect(shortcut).toBeUndefined();
 });
 
-test('getShortcut throws exception when included shortcut was not found', () => {
-  const namespaceDataProvider = new NamespaceDataProviderStub({
-    first: {
-      'a 1': {
-        title: 'Shortcut including other shortcut',
-        include: {
-          key: 'b 1',
-        },
-      },
-    },
-  });
-  const database = new ObjectShortcutDatabase(['first'], namespaceDataProvider);
-
-  expect(() => database.getShortcut('a', 1, 'de')).toThrow(DataDefinitionError);
-});
-
 test('getShortcut returns undefined when shortcut is not found', () => {
   const namespaceDataProvider = new NamespaceDataProviderStub({
     first: {'a 1': firstDummyShortcut},
