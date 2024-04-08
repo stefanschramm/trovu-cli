@@ -10,7 +10,7 @@ See https://trovu.net/ and https://trovu.net/docs/ for more information about Tr
 ## Goals
 
 - Decouple components and add individual unit tests
-- Make core logic usable by a CLI interface
+- Make core logic usable by a command line interface
 
 ## Installation
 
