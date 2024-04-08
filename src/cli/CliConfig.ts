@@ -4,6 +4,7 @@ import os from 'os';
 
 import path from 'path';
 import {fileURLToPath} from 'url';
+import { Shortcut } from '../core/database/Shortcut';
 
 export type CliConfig = {
   readonly country: string,
@@ -71,3 +72,42 @@ function getDefaultConfig(): CliConfig {
     shortcutsDir: `${here}/../../data/shortcuts`,
   };
 }
+
+// @ts-expect-error TODO: Refactor config format to match trovu's config.yml as good as possible
+// eslint-disable-next-line
+type TrovuCliConfig = {
+  browser: string,
+  officialNamespacesDir: string,
+} & TrovuConfig;
+
+type TrovuConfig = {
+  readonly namespaces: NamespaceSource[],
+  readonly language: string,
+  readonly country: string,
+  readonly defaultKeyword: string | undefined,
+}
+
+type NamespaceSource = {
+  name?: string,
+} & (OfficialNamespaceSource | UrlNamespaceSource | GithubNamespaceSource | FileNamespaceSource | StaticNamespaceSource);
+
+type OfficialNamespaceSource = string;
+
+type UrlNamespaceSource = {
+  readonly url?: string,
+}
+
+type GithubNamespaceSource = {
+  readonly github?: string,
+}
+
+/** Special type for trovu-cli only */
+type FileNamespaceSource = {
+  file: ShortcutSearchKeyMap
+}
+
+type StaticNamespaceSource = {
+  shortcuts: ShortcutSearchKeyMap
+}
+
+type ShortcutSearchKeyMap = Record<string, Shortcut>
