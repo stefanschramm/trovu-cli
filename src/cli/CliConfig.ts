@@ -4,12 +4,12 @@ import os from 'os';
 
 import path from 'path';
 import {fileURLToPath} from 'url';
-import { Shortcut } from '../core/database/Shortcut';
+import { NamespaceSource } from '../core/Environment';
 
 export type CliConfig = {
+  readonly namespaces: NamespaceSource[],
   readonly country: string,
   readonly language: string,
-  readonly githubUsername: string | undefined,
   readonly browser: string,
   readonly shortcutsDir: string,
 };
@@ -65,9 +65,13 @@ function getDefaultConfig(): CliConfig {
   const here = path.dirname(fileURLToPath(import.meta.url));
   
   return {
+    namespaces: [
+      'o',
+      'de',
+      '.de',
+    ],
     country: 'de',
     language: 'de',
-    githubUsername: undefined,
     browser: 'open', // TODO: open is xdg-open. Check if this works on other OSes.
     shortcutsDir: `${here}/../../data/shortcuts`,
   };
@@ -86,28 +90,3 @@ type TrovuConfig = {
   readonly country: string,
   readonly defaultKeyword: string | undefined,
 }
-
-type NamespaceSource = {
-  name?: string,
-} & (OfficialNamespaceSource | UrlNamespaceSource | GithubNamespaceSource | FileNamespaceSource | StaticNamespaceSource);
-
-type OfficialNamespaceSource = string;
-
-type UrlNamespaceSource = {
-  readonly url?: string,
-}
-
-type GithubNamespaceSource = {
-  readonly github?: string,
-}
-
-/** Special type for trovu-cli only */
-type FileNamespaceSource = {
-  file: ShortcutSearchKeyMap
-}
-
-type StaticNamespaceSource = {
-  shortcuts: ShortcutSearchKeyMap
-}
-
-type ShortcutSearchKeyMap = Record<string, Shortcut>

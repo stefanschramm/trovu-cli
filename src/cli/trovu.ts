@@ -7,7 +7,6 @@ import { CliConfig, getCliConfig as getCliConfig } from './CliConfig.js';
 import { TrovuError } from '../Error.js';
 import { LocalYamlNamespaceDataLoader } from './LocalYamlNamespaceDataLoader.js';
 import { YamlNamespaceDataLoader, YamlShortcutDatabaseFactory } from '../core/database/YamlShortcutDatabaseFactory.js';
-import { RemoteYamlNamespaceDataLoader } from '../core/database/RemoteYamlNamespaceDataLoader.js';
 
 function main(): void {
   if (process.argv.length < 3) {
@@ -27,7 +26,7 @@ function main(): void {
 
     const cliConfig = getCliConfig();
     const cliEnvironment = new CliEnvironment(cliConfig);
-    const namespaceLoader = getNamespaceLoader(cliConfig);
+    const namespaceLoader = getOfficialNamespaceLoader(cliConfig);
     const databaseFactory = new YamlShortcutDatabaseFactory(namespaceLoader);
     const queryProcessor = new QueryProcessor(cliEnvironment, databaseFactory);
 
@@ -74,11 +73,7 @@ function main(): void {
   }
 }
 
-function getNamespaceLoader(cliConfig: CliConfig): YamlNamespaceDataLoader {
-  if (cliConfig.githubUsername) {
-    return new RemoteYamlNamespaceDataLoader(cliConfig.githubUsername);
-  }
-
+function getOfficialNamespaceLoader(cliConfig: CliConfig): YamlNamespaceDataLoader {
   return new LocalYamlNamespaceDataLoader(cliConfig.shortcutsDir);
 }
 

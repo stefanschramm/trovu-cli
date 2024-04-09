@@ -1,8 +1,12 @@
-import { Environment } from '../core/Environment.js';
+import { Environment, NamespaceSource } from '../core/Environment.js';
 import { CliConfig } from './CliConfig.js';
 
 export class CliEnvironment implements Environment {
   public constructor(private readonly cliConfig: CliConfig) {}
+
+  public getNamespaces(): NamespaceSource[] {
+    return this.cliConfig.namespaces;
+  }
 
   public getCountry(): string {
     return this.cliConfig.country;
@@ -10,9 +14,5 @@ export class CliEnvironment implements Environment {
 
   public getLanguage(): string {
     return this.cliConfig.language;
-  }
-
-  public getGithubUsername(): string | undefined {
-    return this.cliConfig.githubUsername;
   }
 }

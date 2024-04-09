@@ -2,9 +2,6 @@ import { ImplementationError } from '../../Error.js';
 import { YamlNamespaceDataLoader } from './YamlShortcutDatabaseFactory.js';
 
 export class RemoteYamlNamespaceDataLoader implements YamlNamespaceDataLoader {
-  // @ts-expect-error // TODO: use githubUsername
-  public constructor(private readonly githubUsername: string) {}
-
   // TODO: use namespace
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   load(_namespace: string): string {

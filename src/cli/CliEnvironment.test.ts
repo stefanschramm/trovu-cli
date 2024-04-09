@@ -1,12 +1,26 @@
 import { CliEnvironment } from './CliEnvironment.js';
 
 const testCliConfig = {
+  namespaces: [
+    'o',
+    'aa',
+    '.bb',
+  ],
   country: 'aa',
   language: 'bb',
   browser: 'dontcare',
   shortcutsDir: 'dontcare',
-  githubUsername: 'github.username',
 }
+
+test('getNamespaces', () => {
+  const cliEnvironment = new CliEnvironment(testCliConfig);
+
+  expect(cliEnvironment.getNamespaces()).toEqual([
+    'o',
+    'aa',
+    '.bb',
+  ]);
+});
 
 test('getCountry', () => {
   const cliEnvironment = new CliEnvironment(testCliConfig);
@@ -18,10 +32,4 @@ test('getLanguage', () => {
   const cliEnvironment = new CliEnvironment(testCliConfig);
 
   expect(cliEnvironment.getLanguage()).toEqual('bb');
-});
-
-test('getGithubUsername', () => {
-  const cliEnvironment = new CliEnvironment(testCliConfig);
-
-  expect(cliEnvironment.getGithubUsername()).toEqual('github.username');
 });

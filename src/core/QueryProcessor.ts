@@ -1,8 +1,8 @@
-import { type Environment } from './Environment.js';
+import { NamespaceSource, type Environment } from './Environment.js';
 import { ShortcutDatabaseFactory } from './database/Shortcut.js';
 import { QueryParser } from './QueryParser.js';
 import { UrlProcessor } from './url/UrlProcessor.js';
-import { DataDefinitionError } from '../Error.js';
+import { DataDefinitionError, ImplementationError } from '../Error.js';
 
 export class QueryProcessor {
   constructor (
@@ -13,15 +13,15 @@ export class QueryProcessor {
   public process(query: string): QueryProcessingResult {
     const queryParser = new QueryParser();
     const parsedQuery = queryParser.parse(query);
-    const country = parsedQuery.country ?? this.environment.getCountry();
+    // TODO: Where is country used? - Only in UrlProcesor/PlaceholderProcessor?
+    // const country = parsedQuery.country ?? this.environment.getCountry();
     const language = parsedQuery.language ?? this.environment.getLanguage();
     const allNamespaces = [
+      // TODO: We should pass the complete namespace source definitions to the shortcutDatabaseFactory (instead of just the strings).
+      ...mapNamespaceSources(this.environment.getNamespaces()),
       ...parsedQuery.additionalNamespaces,
-      `.${country}`,
-      language,
-      'o',
     ];
-    const namespaces = allNamespaces.filter((value, index) => allNamespaces.indexOf(value) === index);
+    const namespaces = allNamespaces.filter((value, index) => allNamespaces.indexOf(value) === index); // make unique
     const database = this.shortcutDatabaseFactory.getShortcutDatabaseByNamespaces(namespaces);
 
     const shortcut = database.getShortcut(parsedQuery.keyword, parsedQuery.args.length, language);
@@ -73,6 +73,21 @@ export enum QueryProcessingResultStatus {
   Deprecated,
   NotFound,
   // TODO: Are there more result states?
+}
+
+function mapNamespaceSources(namespaces: NamespaceSource[]): string[] {
+  const namespaceNames: string[] = [];
+  for (const namespace of namespaces) {
+    if (typeof namespace === 'string') {
+      namespaceNames.push(namespace);
+      continue;
+    }
+    
+    // TODO
+    throw new ImplementationError('Non-official namespace sources are currently not supported.');
+  }
+  
+  return namespaceNames;
 }
 
 function determineDeprecationAlternative(alternative: string | undefined, args: string[]): string | undefined {
