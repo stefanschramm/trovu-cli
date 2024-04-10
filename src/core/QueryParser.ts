@@ -4,11 +4,15 @@ export class QueryParser {
     const queryParts = query.split(' ');
     const keywordParts = queryParts[0].split('.');
     const keyword = keywordParts[keywordParts.length - 1];
-    const args = queryParts.slice(1).join(' ').split(',').map((keyword: string) => keyword.trim());
+    const args = queryParts
+      .slice(1)
+      .join(' ')
+      .split(',')
+      .map((keyword: string) => keyword.trim());
     let language: string | undefined = undefined;
     const country: string | undefined = undefined;
     const additionalNamespaces: string[] = [];
-  
+
     const prefixes = keywordParts.slice(0, keywordParts.length - 1);
     for (const prefix of prefixes) {
       if (prefix.length == 2) {
@@ -17,7 +21,7 @@ export class QueryParser {
         additionalNamespaces.push(prefix);
       }
     }
-  
+
     return {
       additionalNamespaces,
       keyword,

@@ -18,7 +18,7 @@ export class ObjectShortcutDatabase implements ShortcutDatabase {
 
   public getShortcut(keyword: string, argumentCount: number, language: string): Shortcut | undefined {
     const searchKey = `${keyword} ${argumentCount}`;
-    const finder = new ShortcutFinder(this.namespaces, this.namespaceDataProvider, language)
+    const finder = new ShortcutFinder(this.namespaces, this.namespaceDataProvider, language);
 
     return finder.getShortcutBySearchKey(searchKey);
   }
@@ -32,7 +32,11 @@ class ShortcutFinder {
     private readonly language: string,
   ) {}
 
-  public getShortcutBySearchKey(searchKey: string, overrideNamespaces: string[] | undefined = undefined, maxDepth = 10): Shortcut | undefined {
+  public getShortcutBySearchKey(
+    searchKey: string,
+    overrideNamespaces: string[] | undefined = undefined,
+    maxDepth = 10,
+  ): Shortcut | undefined {
     if (maxDepth <= 0) {
       throw new DataDefinitionError(`Possible circular inclusion detected for searchKey "${searchKey}".`);
     }
@@ -51,7 +55,7 @@ class ShortcutFinder {
           // We don't return partial shortcuts (for example title without url would be useless).
           return undefined;
         }
-        delete(shortcut['include']);
+        delete shortcut['include'];
         shortcut = {
           ...includedShortcut,
           ...shortcut,
@@ -66,11 +70,19 @@ class ShortcutFinder {
     return undefined; // keyword not found
   }
 
-  private getShortcutByIncludeDefinition(include: IncludeDefinition, overrideNamespaces: string[] | undefined, maxDepth = 10): Shortcut | undefined {
+  private getShortcutByIncludeDefinition(
+    include: IncludeDefinition,
+    overrideNamespaces: string[] | undefined,
+    maxDepth = 10,
+  ): Shortcut | undefined {
     if (include instanceof Array) {
       // List of references by namespace - namespace to search in comes from include, not from usual namespace priority list
       for (const includeEntry of include) {
-        const referencedShortcut = this.getShortcutBySearchKey(this.mapSearchKey(includeEntry.key), [includeEntry.namespace], maxDepth);
+        const referencedShortcut = this.getShortcutBySearchKey(
+          this.mapSearchKey(includeEntry.key),
+          [includeEntry.namespace],
+          maxDepth,
+        );
         if (referencedShortcut !== undefined) {
           return referencedShortcut;
         }

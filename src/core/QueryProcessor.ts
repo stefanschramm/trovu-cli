@@ -5,7 +5,7 @@ import { UrlProcessor } from './url/UrlProcessor.js';
 import { DataDefinitionError, ImplementationError } from '../Error.js';
 
 export class QueryProcessor {
-  constructor (
+  constructor(
     private readonly environment: Environment,
     private readonly shortcutDatabaseFactory: ShortcutDatabaseFactory,
   ) {}
@@ -29,7 +29,7 @@ export class QueryProcessor {
     // const resultStatus = determineResultStatus(shortcut);
 
     if (shortcut === undefined) {
-      return {status: QueryProcessingResultStatus.NotFound};
+      return { status: QueryProcessingResultStatus.NotFound };
     }
 
     if (shortcut.deprecated !== undefined) {
@@ -38,7 +38,7 @@ export class QueryProcessor {
         deprecated: {
           created: shortcut?.deprecated?.created,
           alternativeQuery: determineDeprecationAlternative(shortcut?.deprecated?.alternative?.query, parsedQuery.args),
-        }
+        },
       };
     }
 
@@ -63,9 +63,9 @@ type QueryProcessingResult = {
   status: QueryProcessingResultStatus;
   url?: string;
   deprecated?: {
-    readonly alternativeQuery?: string | undefined,
-    readonly created?: string | undefined,
-  },
+    readonly alternativeQuery?: string | undefined;
+    readonly created?: string | undefined;
+  };
 };
 
 export enum QueryProcessingResultStatus {
@@ -82,11 +82,11 @@ function mapNamespaceSources(namespaces: NamespaceSource[]): string[] {
       namespaceNames.push(namespace);
       continue;
     }
-    
+
     // TODO
     throw new ImplementationError('Non-official namespace sources are currently not supported.');
   }
-  
+
   return namespaceNames;
 }
 
@@ -99,7 +99,9 @@ function determineDeprecationAlternative(alternative: string | undefined, args: 
   const placeholderMatches = [...alternative.matchAll(placeholderRe)];
 
   if (placeholderMatches.length !== args.length) {
-    throw new DataDefinitionError(`Number of arguments of deprecation alternative (${placeholderMatches.length}) does not match original shortcut's argument count (${args.length}).`);
+    throw new DataDefinitionError(
+      `Number of arguments of deprecation alternative (${placeholderMatches.length}) does not match original shortcut's argument count (${args.length}).`,
+    );
   }
 
   let populatedAlternative = alternative;

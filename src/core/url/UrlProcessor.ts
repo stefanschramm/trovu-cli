@@ -5,11 +5,10 @@ export class UrlProcessor {
   constructor(private readonly language: string) {}
 
   public process(urlPattern: string, args: string[]): string {
-
     let replacedUrl = urlPattern;
 
     // variable placeholders like <$language> etc.
-    const variablePlaceholderRe = /<\$[^>]+>/g
+    const variablePlaceholderRe = /<\$[^>]+>/g;
     const variablePlaceholderProcessor = new VariablePlaceholderProcessor(this.language);
     for (const match of replacedUrl.matchAll(variablePlaceholderRe)) {
       const replacement = variablePlaceholderProcessor.process(match[0]);
@@ -17,7 +16,7 @@ export class UrlProcessor {
     }
 
     // normal placeholders with user-provided arguments
-    const argumentPlaceholderRe = /<[^>]+>/g
+    const argumentPlaceholderRe = /<[^>]+>/g;
     const argumentProcessor = new ArgumentPlaceholderProcessor();
     let i = 0;
     for (const match of replacedUrl.matchAll(argumentPlaceholderRe)) {
@@ -25,7 +24,7 @@ export class UrlProcessor {
       replacedUrl = replacedUrl.replace(match[0], replacement);
       i++;
     }
-  
+
     return replacedUrl;
   }
 }

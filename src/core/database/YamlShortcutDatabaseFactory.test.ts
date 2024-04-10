@@ -61,7 +61,7 @@ b 1:
     } else if (namespace === 'notfound2') {
       throw 'String as exception';
     }
-    
+
     throw new ImplementationError('Namespace not available in DummyYamlNamespaceDataLoader.');
   }
 }

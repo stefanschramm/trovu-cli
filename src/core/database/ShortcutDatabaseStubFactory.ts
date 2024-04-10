@@ -26,16 +26,16 @@ class ShortcutDatabaseStub implements ShortcutDatabase {
             query: 'bvg <1>, <2>',
           },
           created: '2024-03-31',
-        }
-      }
+        },
+      };
     }
 
     if (keyword === 'noalterantive' && argumentCount === 2) {
       return {
         deprecated: {
           created: '2024-03-31',
-        }
-      }
+        },
+      };
     }
 
     if (keyword === 'invalidalternative' && argumentCount === 2) {
@@ -45,8 +45,8 @@ class ShortcutDatabaseStub implements ShortcutDatabase {
             query: 'alternative <1>, <2>, <3>', // invalid number of arguments in alternative
           },
           created: '2024-03-31',
-        }
-      }
+        },
+      };
     }
 
     if (keyword === 'resultmissingurl' && argumentCount === 2) {

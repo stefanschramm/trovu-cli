@@ -28,8 +28,8 @@ test('getShortcut considers argument count', () => {
 
 test('getShortcut considers namespace priority', () => {
   const namespaceDataProvider = new NamespaceDataProviderStub({
-    first: {'a 1': firstDummyShortcut},
-    second: {'a 1': secondDummyShortcut},
+    first: { 'a 1': firstDummyShortcut },
+    second: { 'a 1': secondDummyShortcut },
   });
   const database = new ObjectShortcutDatabase(['second', 'first'], namespaceDataProvider);
 
@@ -120,7 +120,7 @@ test('getShortcut processes include list attribute and returns undefined if incl
 
 test('getShortcut returns undefined when shortcut is not found', () => {
   const namespaceDataProvider = new NamespaceDataProviderStub({
-    first: {'a 1': firstDummyShortcut},
+    first: { 'a 1': firstDummyShortcut },
   });
   const database = new ObjectShortcutDatabase(['first'], namespaceDataProvider);
 
@@ -152,9 +152,7 @@ test('getShortcut throws exception on circular includes', () => {
 });
 
 class NamespaceDataProviderStub implements NamespaceDataProvider {
-  public constructor(
-    private readonly data: Record<string, Record<string, Shortcut>>,
-  ) {}
+  public constructor(private readonly data: Record<string, Record<string, Shortcut>>) {}
 
   get(namespace: string): Record<string, Shortcut> {
     return this.data[namespace];

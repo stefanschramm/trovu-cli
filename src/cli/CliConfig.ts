@@ -3,15 +3,15 @@ import fs from 'fs';
 import os from 'os';
 
 import path from 'path';
-import {fileURLToPath} from 'url';
+import { fileURLToPath } from 'url';
 import { NamespaceSource } from '../core/Environment';
 
 export type CliConfig = {
-  readonly namespaces: NamespaceSource[],
-  readonly country: string,
-  readonly language: string,
-  readonly browser: string,
-  readonly shortcutsDir: string,
+  readonly namespaces: NamespaceSource[];
+  readonly country: string;
+  readonly language: string;
+  readonly browser: string;
+  readonly shortcutsDir: string;
 };
 
 /*
@@ -63,13 +63,9 @@ function getDefaultConfigFile(): string {
 
 function getDefaultConfig(): CliConfig {
   const here = path.dirname(fileURLToPath(import.meta.url));
-  
+
   return {
-    namespaces: [
-      'o',
-      'de',
-      '.de',
-    ],
+    namespaces: ['o', 'de', '.de'],
     country: 'de',
     language: 'de',
     browser: 'open', // TODO: open is xdg-open. Check if this works on other OSes.
@@ -80,13 +76,13 @@ function getDefaultConfig(): CliConfig {
 // @ts-expect-error TODO: Refactor config format to match trovu's config.yml as good as possible
 // eslint-disable-next-line
 type TrovuCliConfig = {
-  browser: string,
-  officialNamespacesDir: string,
+  browser: string;
+  officialNamespacesDir: string;
 } & TrovuConfig;
 
 type TrovuConfig = {
-  readonly namespaces: NamespaceSource[],
-  readonly language: string,
-  readonly country: string,
-  readonly defaultKeyword: string | undefined,
-}
+  readonly namespaces: NamespaceSource[];
+  readonly language: string;
+  readonly country: string;
+  readonly defaultKeyword: string | undefined;
+};

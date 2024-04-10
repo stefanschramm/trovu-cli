@@ -5,8 +5,8 @@ test('process replaces argument placeholders', () => {
 
   const result = urlProcessor.process(
     'https://www.bvg.de/de/verbindungen/verbindungssuche?S=<Start>&Z=<Ziel>&start=1',
-    ['Alexanderplatz', 'Hermannplatz']
-  )
+    ['Alexanderplatz', 'Hermannplatz'],
+  );
 
   expect(result).toEqual('https://www.bvg.de/de/verbindungen/verbindungssuche?S=Alexanderplatz&Z=Hermannplatz&start=1');
 });
@@ -16,8 +16,8 @@ test('process replaces variable placeholder', () => {
 
   const result = urlProcessor.process(
     'https://<$language>.wikipedia.org/wiki/Special:Search?go=Article&search=<article>',
-    ['Berlin']
-  )
+    ['Berlin'],
+  );
 
   expect(result).toEqual('https://en.wikipedia.org/wiki/Special:Search?go=Article&search=Berlin');
 });

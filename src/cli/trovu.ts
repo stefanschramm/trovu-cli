@@ -34,23 +34,24 @@ function main(): void {
     const result = queryProcessor.process(query);
 
     switch (result.status) {
-      case QueryProcessingResultStatus.Success:
-      {
+      case QueryProcessingResultStatus.Success: {
         if (result.url === undefined) {
           console.error(`No url returned.`);
           return;
         }
         console.log(`Opening ${result.url}`);
-        const process = spawn(cliConfig.browser, [result.url], {detached: true, stdio: [ 'ignore', 'ignore', 'ignore']});
+        const process = spawn(cliConfig.browser, [result.url], {
+          detached: true,
+          stdio: ['ignore', 'ignore', 'ignore'],
+        });
         process.unref();
         break;
       }
 
-      case QueryProcessingResultStatus.Deprecated:
-      {
-        const date = (result.deprecated?.created) ?? 'an unknown date';
+      case QueryProcessingResultStatus.Deprecated: {
+        const date = result.deprecated?.created ?? 'an unknown date';
         const alternativeQuery = result?.deprecated?.alternativeQuery;
-        let message = `This shortcut is deprecated since ${date}.`
+        let message = `This shortcut is deprecated since ${date}.`;
         if (alternativeQuery !== undefined) {
           message += ` Try the following query as replacement: "${alternativeQuery}".`;
         }
@@ -58,8 +59,7 @@ function main(): void {
         break;
       }
 
-      case QueryProcessingResultStatus.NotFound:
-      {
+      case QueryProcessingResultStatus.NotFound: {
         console.error('Command not found.');
         break;
       }

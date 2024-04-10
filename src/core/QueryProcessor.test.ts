@@ -7,7 +7,9 @@ test('process known keyword', () => {
   const result = getQueryProcessor().process('bvg Hermannplatz, Alexanderplatz');
 
   expect(result.status).toBe(QueryProcessingResultStatus.Success);
-  expect(result.url).toBe('https://www.bvg.de/de/verbindungen/verbindungssuche?S=Hermannplatz&Z=Alexanderplatz&start=1');
+  expect(result.url).toBe(
+    'https://www.bvg.de/de/verbindungen/verbindungssuche?S=Hermannplatz&Z=Alexanderplatz&start=1',
+  );
 });
 
 test('process unknown keyword', () => {
@@ -16,7 +18,6 @@ test('process unknown keyword', () => {
   expect(result.status).toBe(QueryProcessingResultStatus.NotFound);
   expect(result.url).toBe(undefined);
 });
-
 
 test('process deprecated shortcut', () => {
   const result = getQueryProcessor().process('behvaugeh Alexanderplatz, Hermannplatz');
@@ -52,8 +53,5 @@ test('process with non-deprecated shourtcut without url throws exception', () =>
 });
 
 function getQueryProcessor() {
-  return new QueryProcessor(
-    new EnvironmentStub(),
-    new ShortcutDatabaseStubFactory(),
-  );
+  return new QueryProcessor(new EnvironmentStub(), new ShortcutDatabaseStubFactory());
 }
