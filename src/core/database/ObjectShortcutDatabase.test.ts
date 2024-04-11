@@ -2,7 +2,7 @@ import { DataDefinitionError, ImplementationError } from '../../Error.js';
 import { NamespaceSource } from '../Environment.js';
 import { NamespaceDispatcher, NamespaceSourceHandler } from '../NamespaceDispatcher.js';
 import { ObjectShortcutDatabase } from './ObjectShortcutDatabase.js';
-import { Shortcut } from './Shortcut.js';
+import { RawShortcut } from './Shortcut.js';
 
 const firstDummyShortcut = {
   title: 'First dummy shortcut',
@@ -158,20 +158,20 @@ test('getShortcut throws exception on circular includes', async () => {
   }
 });
 
-function createNamespaceDispatcher(data: Record<string, Record<string, Shortcut>>) {
-  const namespaceSourceHandler = new NamespaceSourceHandlerStub(data);
+function createNamespaceDispatcher(data: Record<string, Record<string, RawShortcut>>) {
+  const namespaceSourceHandler = new NamespaceSourceHandlerDummy(data);
 
   return new NamespaceDispatcher([namespaceSourceHandler]);
 }
 
-class NamespaceSourceHandlerStub implements NamespaceSourceHandler {
-  public constructor(private readonly data: Record<string, Record<string, Shortcut>>) {}
+class NamespaceSourceHandlerDummy implements NamespaceSourceHandler {
+  public constructor(private readonly data: Record<string, Record<string, RawShortcut>>) {}
 
   public supports(source: NamespaceSource): boolean {
     return typeof source === 'string';
   }
 
-  public async get(source: NamespaceSource): Promise<Record<string, Shortcut>> {
+  public async get(source: NamespaceSource): Promise<Record<string, RawShortcut>> {
     if (typeof source !== 'string') {
       throw new ImplementationError('source is expected to be a string.');
     }

@@ -41,9 +41,9 @@ type StaticNamespaceSource = {
 type ShortcutSearchKeyMap = Record<string, Shortcut>;
 
 /**
- * Common Environment stub for unit tests
+ * Common Environment dummy for unit tests
  */
-export class EnvironmentStub implements Environment {
+export class EnvironmentDummy implements Environment {
   public getNamespaces(): NamespaceSource[] {
     return ['o', 'de', '.de'];
   }

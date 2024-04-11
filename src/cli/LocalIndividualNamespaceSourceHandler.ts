@@ -1,12 +1,12 @@
 import { NamespaceSource } from '../core/Environment.js';
 import { NamespaceSourceHandler } from '../core/NamespaceDispatcher.js';
-import { Shortcut } from '../core/database/Shortcut.js';
+import { RawShortcut } from '../core/database/Shortcut.js';
 import { DataDefinitionError, ImplementationError, UsageError } from '../Error.js';
 import fs from 'fs';
 import yaml from 'yaml';
 
 export class LocalIndividualNamespaceSourceHandler implements NamespaceSourceHandler {
-  private readonly cache: Record<string, Record<string, Shortcut>> = {};
+  private readonly cache: Record<string, Record<string, RawShortcut>> = {};
 
   public constructor(private readonly path: string) {}
 
@@ -14,7 +14,7 @@ export class LocalIndividualNamespaceSourceHandler implements NamespaceSourceHan
     return typeof source === 'string';
   }
 
-  public async get(source: NamespaceSource): Promise<Record<string, Shortcut>> {
+  public async get(source: NamespaceSource): Promise<Record<string, RawShortcut>> {
     if (typeof source !== 'string') {
       throw new ImplementationError('NamespaceSource not supported by LocalIndividualNamespaceSourceHandler.');
     }

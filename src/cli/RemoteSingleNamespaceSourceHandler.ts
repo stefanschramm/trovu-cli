@@ -1,10 +1,10 @@
 import { NamespaceSource } from '../core/Environment.js';
 import { NamespaceSourceHandler } from '../core/NamespaceDispatcher.js';
-import { Shortcut } from '../core/database/Shortcut.js';
+import { RawShortcut } from '../core/database/Shortcut.js';
 import { ImplementationError } from '../Error.js';
 
 export class RemoteSingleNamespaceSourceHandler implements NamespaceSourceHandler {
-  private cache: Record<string, Record<string, Shortcut>> = {};
+  private cache: Record<string, Record<string, RawShortcut>> = {};
 
   public constructor(private readonly url: string) {}
 
@@ -12,7 +12,7 @@ export class RemoteSingleNamespaceSourceHandler implements NamespaceSourceHandle
     return typeof source === 'string';
   }
 
-  public async get(source: NamespaceSource): Promise<Record<string, Shortcut>> {
+  public async get(source: NamespaceSource): Promise<Record<string, RawShortcut>> {
     if (typeof source !== 'string') {
       throw new ImplementationError('NamespaceSource not supported by RemoteSingleNamespaceSourceHandler.');
     }

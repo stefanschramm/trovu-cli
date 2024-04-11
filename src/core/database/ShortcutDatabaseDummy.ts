@@ -1,4 +1,5 @@
-import { Shortcut, ShortcutDatabase } from './Shortcut.js';
+import { Shortcut } from './Shortcut.js';
+import { ShortcutDatabase } from './ShortcutDatabase.js';
 
 /**
  * Dummy for usage in unit tests

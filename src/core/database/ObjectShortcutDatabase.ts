@@ -1,7 +1,8 @@
 import { DataDefinitionError } from '../../Error.js';
 import { NamespaceSource } from '../Environment.js';
 import { NamespaceDispatcher } from '../NamespaceDispatcher.js';
-import { IncludeDefinition, Shortcut, ShortcutDatabase } from './Shortcut.js';
+import { IncludeDefinition, Shortcut } from './Shortcut.js';
+import { ShortcutDatabase } from './ShortcutDatabase.js';
 
 /**
  * Shortcut database that is based on a hierarchy of JavaScript objects grouped by namespaces (classical Trovu YAML data)

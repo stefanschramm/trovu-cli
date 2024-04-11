@@ -2,7 +2,7 @@ import { type Environment } from './Environment.js';
 import { QueryParser } from './QueryParser.js';
 import { UrlProcessor } from './url/UrlProcessor.js';
 import { DataDefinitionError } from '../Error.js';
-import { ShortcutDatabase } from './database/Shortcut.js';
+import { ShortcutDatabase } from './database/ShortcutDatabase.js';
 
 export class QueryProcessor {
   constructor(

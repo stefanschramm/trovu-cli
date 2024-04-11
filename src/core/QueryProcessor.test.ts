@@ -1,5 +1,5 @@
 import { QueryProcessingResultStatus, QueryProcessor } from './QueryProcessor.js';
-import { EnvironmentStub } from './Environment.js';
+import { EnvironmentDummy } from './Environment.js';
 import { ShortcutDatabaseDummy } from './database/ShortcutDatabaseDummy.js';
 import { DataDefinitionError } from '../Error.js';
 
@@ -63,5 +63,5 @@ test('process with non-deprecated shourtcut without url throws exception', async
 });
 
 function getQueryProcessor() {
-  return new QueryProcessor(new EnvironmentStub(), new ShortcutDatabaseDummy());
+  return new QueryProcessor(new EnvironmentDummy(), new ShortcutDatabaseDummy());
 }

@@ -1,11 +1,9 @@
-import { NamespaceSource } from '../Environment';
-
+/**
+ * A procesed shortcut without "include" property
+ */
 export type Shortcut = {
-  /** Shortcuts with include attribute might not have urls */
   readonly url?: string;
   readonly title?: string;
-  /** The include property is not readonly because we remove it while processing. */
-  include?: IncludeDefinition;
   readonly deprecated?: {
     readonly alternative?: {
       readonly query: string;
@@ -14,23 +12,16 @@ export type Shortcut = {
   };
   // TODO: other properties?
 };
-// TODO: differentiate between RawShortcut (without url but possibly with include) and Shortcut (with url and without include)
+
+/**
+ * Raw shortcut definition as found in YAML/JSON data sets (including "include" properties)
+ */
+export type RawShortcut = Shortcut & {
+  /** The include property is not readonly because we remove it while processing. */
+  include?: IncludeDefinition;
+};
 
 // TODO: Support "Short notation" like "examplekeyword 1: http://www.example.com/?q=<param1>"
-
-// Currently only ObjectShortcutDatabase is implementing this interface.
-// But nevertheless it's good to define it in case we want to switch to some other implementation (redis, sqlite, ...) someday.
-export interface ShortcutDatabase {
-  /**
-   * @param language Language to use when replacing search keys of includes
-   */
-  getShortcut(
-    keyword: string,
-    argumentCount: number,
-    language: string,
-    namespaces: NamespaceSource[],
-  ): Promise<Shortcut | undefined>;
-}
 
 export type IncludeDefinition = SimpleIncludeDefinition | NamespaceIncludeDefinition[];
 
