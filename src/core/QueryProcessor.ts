@@ -1,13 +1,13 @@
-import { NamespaceSource, type Environment } from './Environment.js';
-import { ShortcutDatabaseFactory } from './database/Shortcut.js';
+import { type Environment } from './Environment.js';
 import { QueryParser } from './QueryParser.js';
 import { UrlProcessor } from './url/UrlProcessor.js';
-import { DataDefinitionError, ImplementationError } from '../Error.js';
+import { DataDefinitionError } from '../Error.js';
+import { ShortcutDatabase } from './database/Shortcut.js';
 
 export class QueryProcessor {
   constructor(
     private readonly environment: Environment,
-    private readonly shortcutDatabaseFactory: ShortcutDatabaseFactory,
+    private readonly database: ShortcutDatabase,
   ) {}
 
   public process(query: string): QueryProcessingResult {
@@ -17,16 +17,12 @@ export class QueryProcessor {
     // const country = parsedQuery.country ?? this.environment.getCountry();
     const language = parsedQuery.language ?? this.environment.getLanguage();
     const allNamespaces = [
-      // TODO: We should pass the complete namespace source definitions to the shortcutDatabaseFactory (instead of just the strings).
-      ...mapNamespaceSources(this.environment.getNamespaces()),
+      ...this.environment.getNamespaces(),
       ...parsedQuery.additionalNamespaces,
     ];
-    const namespaces = allNamespaces.filter((value, index) => allNamespaces.indexOf(value) === index); // make unique
-    const database = this.shortcutDatabaseFactory.getShortcutDatabaseByNamespaces(namespaces);
+    const namespaces = allNamespaces.filter((value, index) => allNamespaces.indexOf(value) === index); // make unique TODO: does === work for all?
 
-    const shortcut = database.getShortcut(parsedQuery.keyword, parsedQuery.args.length, language);
-
-    // const resultStatus = determineResultStatus(shortcut);
+    const shortcut = this.database.getShortcut(parsedQuery.keyword, parsedQuery.args.length, language, namespaces);
 
     if (shortcut === undefined) {
       return { status: QueryProcessingResultStatus.NotFound };
@@ -36,7 +32,7 @@ export class QueryProcessor {
       return {
         status: QueryProcessingResultStatus.Deprecated,
         deprecated: {
-          created: shortcut?.deprecated?.created,
+          created: shortcut.deprecated.created,
           alternativeQuery: determineDeprecationAlternative(shortcut?.deprecated?.alternative?.query, parsedQuery.args),
         },
       };
@@ -44,8 +40,8 @@ export class QueryProcessor {
 
     // success
 
-    if (shortcut?.url === undefined) {
-      throw new DataDefinitionError('shortcut?.url was undefined although the result was not deprecated!?');
+    if (shortcut.url === undefined) {
+      throw new DataDefinitionError('shortcut.url was undefined although the result was not deprecated!?');
     }
 
     const urlProcessor = new UrlProcessor(language);
@@ -73,21 +69,6 @@ export enum QueryProcessingResultStatus {
   Deprecated,
   NotFound,
   // TODO: Are there more result states?
-}
-
-function mapNamespaceSources(namespaces: NamespaceSource[]): string[] {
-  const namespaceNames: string[] = [];
-  for (const namespace of namespaces) {
-    if (typeof namespace === 'string') {
-      namespaceNames.push(namespace);
-      continue;
-    }
-
-    // TODO
-    throw new ImplementationError('Non-official namespace sources are currently not supported.');
-  }
-
-  return namespaceNames;
 }
 
 function determineDeprecationAlternative(alternative: string | undefined, args: string[]): string | undefined {

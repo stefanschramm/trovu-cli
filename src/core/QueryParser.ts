@@ -1,3 +1,5 @@
+import { NamespaceSource } from './Environment';
+
 export class QueryParser {
   public parse(query: string): ParsedQuery {
     // TODO: does this cover the complete syntax?
@@ -11,7 +13,7 @@ export class QueryParser {
       .map((keyword: string) => keyword.trim());
     let language: string | undefined = undefined;
     const country: string | undefined = undefined;
-    const additionalNamespaces: string[] = [];
+    const additionalNamespaces: NamespaceSource[] = []; // actually all strings
 
     const prefixes = keywordParts.slice(0, keywordParts.length - 1);
     for (const prefix of prefixes) {
@@ -33,7 +35,7 @@ export class QueryParser {
 }
 
 export type ParsedQuery = {
-  additionalNamespaces: string[];
+  additionalNamespaces: NamespaceSource[];
   keyword: string;
   args: string[];
   language: string | undefined;

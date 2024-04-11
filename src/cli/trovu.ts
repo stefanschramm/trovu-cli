@@ -3,10 +3,11 @@
 import { QueryProcessingResultStatus, QueryProcessor } from '../core/QueryProcessor.js';
 import { CliEnvironment } from './CliEnvironment.js';
 import { spawn } from 'child_process';
-import { CliConfig, getCliConfig as getCliConfig } from './CliConfig.js';
+import { getCliConfig } from './CliConfig.js';
 import { TrovuError } from '../Error.js';
-import { LocalYamlNamespaceDataLoader } from './LocalYamlNamespaceDataLoader.js';
-import { YamlNamespaceDataLoader, YamlShortcutDatabaseFactory } from '../core/database/YamlShortcutDatabaseFactory.js';
+import { LocalIndividualNamespaceSourceHandler } from './LocalIndividualNamespaceSourceHandler.js';
+import { NamespaceDispatcher } from '../core/NamespaceDispatcher.js';
+import { ObjectShortcutDatabase } from '../core/database/ObjectShortcutDatabase.js';
 
 function main(): void {
   if (process.argv.length < 3) {
@@ -26,9 +27,12 @@ function main(): void {
 
     const cliConfig = getCliConfig();
     const cliEnvironment = new CliEnvironment(cliConfig);
-    const namespaceLoader = getOfficialNamespaceLoader(cliConfig);
-    const databaseFactory = new YamlShortcutDatabaseFactory(namespaceLoader);
-    const queryProcessor = new QueryProcessor(cliEnvironment, databaseFactory);
+    const namespaceDispatcher = new NamespaceDispatcher([
+      new LocalIndividualNamespaceSourceHandler(cliConfig.shortcutsDir),
+      // TODO: Add handler for GitHub and In-Place namespace definitions
+    ]);
+    const shortcutDatabase = new ObjectShortcutDatabase(namespaceDispatcher);
+    const queryProcessor = new QueryProcessor(cliEnvironment, shortcutDatabase);
 
     console.log(`Processing query "${query}"...`);
     const result = queryProcessor.process(query);
@@ -71,10 +75,6 @@ function main(): void {
       console.error(e); // show stack trace for unexpected errors
     }
   }
-}
-
-function getOfficialNamespaceLoader(cliConfig: CliConfig): YamlNamespaceDataLoader {
-  return new LocalYamlNamespaceDataLoader(cliConfig.shortcutsDir);
 }
 
 main();

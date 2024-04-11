@@ -1,4 +1,4 @@
-import { Shortcut } from './database/Shortcut';
+import { Shortcut } from './database/Shortcut.js';
 
 export interface Environment {
   getCountry(): string;

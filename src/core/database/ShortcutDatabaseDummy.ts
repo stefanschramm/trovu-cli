@@ -1,16 +1,9 @@
-import { Shortcut, ShortcutDatabase, ShortcutDatabaseFactory } from './Shortcut.js';
+import { Shortcut, ShortcutDatabase } from './Shortcut.js';
 
 /**
- * Creates ShortcutDatabaseStub for usage in unit tests
+ * Dummy for usage in unit tests
  */
-export class ShortcutDatabaseStubFactory implements ShortcutDatabaseFactory {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  getShortcutDatabaseByNamespaces(_namespaces: string[]): ShortcutDatabase {
-    return new ShortcutDatabaseStub();
-  }
-}
-
-class ShortcutDatabaseStub implements ShortcutDatabase {
+export class ShortcutDatabaseDummy implements ShortcutDatabase {
   getShortcut(keyword: string, argumentCount: number): Shortcut | undefined {
     if (keyword === 'bvg' && argumentCount === 2) {
       return {

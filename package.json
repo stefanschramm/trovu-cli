@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "npx tsc && chmod +x dist/cli/trovu.js",
+    "build": "npx tsc ; chmod +x dist/cli/trovu.js",
     "build-watch": "npx tsc --watch",
     "test": "npx jest --verbose src/",
     "coverage": "npx jest --verbose --coverage src/",

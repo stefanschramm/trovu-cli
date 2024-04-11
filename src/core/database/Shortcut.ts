@@ -1,3 +1,5 @@
+import { NamespaceSource } from '../Environment';
+
 export type Shortcut = {
   /** Shortcuts with include attribute might not have urls */
   readonly url?: string;
@@ -22,16 +24,7 @@ export interface ShortcutDatabase {
   /**
    * @param language Language to use when replacing search keys of includes
    */
-  getShortcut(keyword: string, argumentCount: number, language: string): Shortcut | undefined;
-}
-
-export interface ShortcutDatabaseFactory {
-  /**
-   * Returns ShortcutDatabase for the specified namespaces.
-   *
-   * The order of namespaces is important for prioritization.
-   **/
-  getShortcutDatabaseByNamespaces(namespaces: string[]): ShortcutDatabase;
+  getShortcut(keyword: string, argumentCount: number, language: string, namespaces: NamespaceSource[]): Shortcut | undefined;
 }
 
 export type IncludeDefinition = SimpleIncludeDefinition | NamespaceIncludeDefinition[];

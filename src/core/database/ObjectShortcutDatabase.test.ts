@@ -1,5 +1,7 @@
-import { DataDefinitionError } from '../../Error.js';
-import { NamespaceDataProvider, ObjectShortcutDatabase } from './ObjectShortcutDatabase.js';
+import { DataDefinitionError, ImplementationError } from '../../Error.js';
+import { NamespaceSource } from '../Environment.js';
+import { NamespaceDispatcher, NamespaceSourceHandler } from '../NamespaceDispatcher.js';
+import { ObjectShortcutDatabase } from './ObjectShortcutDatabase.js';
 import { Shortcut } from './Shortcut.js';
 
 const firstDummyShortcut = {
@@ -13,33 +15,33 @@ const secondDummyShortcut = {
 };
 
 test('getShortcut considers argument count', () => {
-  const namespaceDataProvider = new NamespaceDataProviderStub({
+  const dispatcher = createNamespaceDispatcher({
     first: {
       'a 1': firstDummyShortcut,
       'a 2': secondDummyShortcut,
     },
   });
-  const database = new ObjectShortcutDatabase(['first'], namespaceDataProvider);
+  const database = new ObjectShortcutDatabase(dispatcher);
 
-  const shortcut = database.getShortcut('a', 2, 'de');
+  const shortcut = database.getShortcut('a', 2, 'de', ['first']);
 
   expect(shortcut).toEqual(secondDummyShortcut);
 });
 
 test('getShortcut considers namespace priority', () => {
-  const namespaceDataProvider = new NamespaceDataProviderStub({
+  const dispatcher = createNamespaceDispatcher({
     first: { 'a 1': firstDummyShortcut },
     second: { 'a 1': secondDummyShortcut },
   });
-  const database = new ObjectShortcutDatabase(['second', 'first'], namespaceDataProvider);
+  const database = new ObjectShortcutDatabase(dispatcher);
 
-  const shortcut = database.getShortcut('a', 1, 'de');
+  const shortcut = database.getShortcut('a', 1, 'de', ['second', 'first']);
 
   expect(shortcut).toEqual(secondDummyShortcut);
 });
 
 test('getShortcut processes include attribute', () => {
-  const namespaceDataProvider = new NamespaceDataProviderStub({
+  const dispatcher = createNamespaceDispatcher({
     first: {
       'a 1': {
         title: 'Shortcut including other shortcut',
@@ -50,9 +52,9 @@ test('getShortcut processes include attribute', () => {
       'b 1': firstDummyShortcut,
     },
   });
-  const database = new ObjectShortcutDatabase(['first'], namespaceDataProvider);
+  const database = new ObjectShortcutDatabase(dispatcher);
 
-  const shortcut = database.getShortcut('a', 1, 'de');
+  const shortcut = database.getShortcut('a', 1, 'de', ['first']);
 
   expect(shortcut).toEqual({
     // title of "a 1" but url of "b 1"
@@ -62,7 +64,7 @@ test('getShortcut processes include attribute', () => {
 });
 
 test('getShortcut processes include list attribute', () => {
-  const namespaceDataProvider = new NamespaceDataProviderStub({
+  const dispatcher = createNamespaceDispatcher({
     first: {
       'a 1': {
         title: 'Shortcut including other shortcut',
@@ -85,9 +87,9 @@ test('getShortcut processes include list attribute', () => {
       'b 1': secondDummyShortcut,
     },
   });
-  const database = new ObjectShortcutDatabase(['first'], namespaceDataProvider);
+  const database = new ObjectShortcutDatabase(dispatcher);
 
-  const shortcut = database.getShortcut('a', 1, 'de');
+  const shortcut = database.getShortcut('a', 1, 'de', ['first']);
 
   expect(shortcut).toEqual({
     // title of "a 1" but url of "b 1" of second (not third!) namespace
@@ -97,7 +99,7 @@ test('getShortcut processes include list attribute', () => {
 });
 
 test('getShortcut processes include list attribute and returns undefined if include was not found', () => {
-  const namespaceDataProvider = new NamespaceDataProviderStub({
+  const dispatcher = createNamespaceDispatcher({
     first: {
       'a 1': {
         title: 'Shortcut including other shortcut',
@@ -111,26 +113,26 @@ test('getShortcut processes include list attribute and returns undefined if incl
     },
     second: {},
   });
-  const database = new ObjectShortcutDatabase(['first'], namespaceDataProvider);
+  const database = new ObjectShortcutDatabase(dispatcher);
 
-  const shortcut = database.getShortcut('a', 1, 'de');
+  const shortcut = database.getShortcut('a', 1, 'de', ['first']);
 
   expect(shortcut).toBeUndefined();
 });
 
 test('getShortcut returns undefined when shortcut is not found', () => {
-  const namespaceDataProvider = new NamespaceDataProviderStub({
+  const dispatcher = createNamespaceDispatcher({
     first: { 'a 1': firstDummyShortcut },
   });
-  const database = new ObjectShortcutDatabase(['first'], namespaceDataProvider);
+  const database = new ObjectShortcutDatabase(dispatcher);
 
-  const shortcut = database.getShortcut('unknownkeyword', 1, 'de');
+  const shortcut = database.getShortcut('unknownkeyword', 1, 'de', ['first']);
 
   expect(shortcut).toEqual(undefined);
 });
 
 test('getShortcut throws exception on circular includes', () => {
-  const namespaceDataProvider = new NamespaceDataProviderStub({
+  const dispatcher = createNamespaceDispatcher({
     first: {
       'a 1': {
         title: 'Shortcut including other shortcut',
@@ -146,15 +148,29 @@ test('getShortcut throws exception on circular includes', () => {
       },
     },
   });
-  const database = new ObjectShortcutDatabase(['first'], namespaceDataProvider);
+  const database = new ObjectShortcutDatabase(dispatcher);
 
-  expect(() => database.getShortcut('a', 1, 'de')).toThrow(DataDefinitionError);
+  expect(() => database.getShortcut('a', 1, 'de', ['first'])).toThrow(DataDefinitionError);
 });
 
-class NamespaceDataProviderStub implements NamespaceDataProvider {
+function createNamespaceDispatcher(data: Record<string, Record<string, Shortcut>>) {
+  const namespaceSourceHandler = new NamespaceSourceHandlerStrub(data);
+
+  return new NamespaceDispatcher([namespaceSourceHandler]);
+}
+
+class NamespaceSourceHandlerStrub implements NamespaceSourceHandler {
   public constructor(private readonly data: Record<string, Record<string, Shortcut>>) {}
 
-  get(namespace: string): Record<string, Shortcut> {
-    return this.data[namespace];
+  public supports(source: NamespaceSource): boolean {
+    return typeof source === 'string';
+  }
+
+  public get(source: NamespaceSource): Record<string, Shortcut> {
+    if (typeof source !== 'string') {
+      throw new ImplementationError('source is expected to be a string.');
+    }
+
+    return this.data[source];
   }
 }
