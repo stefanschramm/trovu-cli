@@ -1,5 +1,5 @@
 import { NamespaceSource } from '../core/Environment.js';
-import { NamespaceSourceHandler } from '../core/NamespaceDispatcher.js';
+import { NamespaceSourceHandler } from '../core/namespaces/NamespaceDispatcher.js';
 import { RawShortcut } from '../core/database/Shortcut.js';
 import { DataDefinitionError, ImplementationError, UsageError } from '../Error.js';
 import fs from 'fs';

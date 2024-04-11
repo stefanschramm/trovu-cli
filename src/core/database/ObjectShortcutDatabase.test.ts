@@ -1,6 +1,6 @@
 import { DataDefinitionError, ImplementationError } from '../../Error.js';
 import { NamespaceSource } from '../Environment.js';
-import { NamespaceDispatcher, NamespaceSourceHandler } from '../NamespaceDispatcher.js';
+import { NamespaceDispatcher, NamespaceSourceHandler } from '../namespaces/NamespaceDispatcher.js';
 import { ObjectShortcutDatabase } from './ObjectShortcutDatabase.js';
 import { RawShortcut } from './Shortcut.js';
 

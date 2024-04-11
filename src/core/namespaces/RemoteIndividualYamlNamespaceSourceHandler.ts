@@ -1,7 +1,7 @@
-import { NamespaceSource } from '../core/Environment.js';
-import { NamespaceSourceHandler } from '../core/NamespaceDispatcher.js';
-import { RawShortcut } from '../core/database/Shortcut.js';
-import { DataDefinitionError, ImplementationError, UsageError } from '../Error.js';
+import { NamespaceSource } from '../Environment.js';
+import { NamespaceSourceHandler } from './NamespaceDispatcher.js';
+import { RawShortcut } from '../database/Shortcut.js';
+import { DataDefinitionError, ImplementationError, UsageError } from '../../Error.js';
 import yaml from 'yaml';
 
 /**

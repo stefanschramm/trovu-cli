@@ -1,6 +1,6 @@
 import { DataDefinitionError } from '../../Error.js';
 import { NamespaceSource } from '../Environment.js';
-import { NamespaceDispatcher } from '../NamespaceDispatcher.js';
+import { NamespaceDispatcher } from '../namespaces/NamespaceDispatcher.js';
 import { IncludeDefinition, Shortcut } from './Shortcut.js';
 import { ShortcutDatabase } from './ShortcutDatabase.js';
 

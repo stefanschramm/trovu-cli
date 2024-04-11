@@ -5,7 +5,7 @@ import { CliEnvironment } from './CliEnvironment.js';
 import { spawn } from 'child_process';
 import { getCliConfig } from './CliConfig.js';
 import { TrovuError } from '../Error.js';
-import { NamespaceDispatcher } from '../core/NamespaceDispatcher.js';
+import { NamespaceDispatcher } from '../core/namespaces/NamespaceDispatcher.js';
 import { ObjectShortcutDatabase } from '../core/database/ObjectShortcutDatabase.js';
 import { LocalIndividualYamlNamespaceSourceHandler } from './LocalIndividualYamlNamespaceSourceHandler.js';
 

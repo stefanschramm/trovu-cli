@@ -1,7 +1,7 @@
-import { NamespaceSource } from '../core/Environment.js';
-import { NamespaceSourceHandler } from '../core/NamespaceDispatcher.js';
-import { RawShortcut } from '../core/database/Shortcut.js';
-import { ImplementationError } from '../Error.js';
+import { NamespaceSource } from '../Environment.js';
+import { NamespaceSourceHandler } from './NamespaceDispatcher.js';
+import { RawShortcut } from '../database/Shortcut.js';
+import { ImplementationError } from '../../Error.js';
 
 /**
  * This handler is supposed to be used with Trovu's "copiled" JSON shortcut database

@@ -1,6 +1,6 @@
-import { ImplementationError } from '../Error.js';
-import { NamespaceSource } from './Environment.js';
-import { RawShortcut } from './database/Shortcut.js';
+import { ImplementationError } from '../../Error.js';
+import { NamespaceSource } from '../Environment.js';
+import { RawShortcut } from '../database/Shortcut.js';
 
 export interface NamespaceSourceHandler {
   supports(source: NamespaceSource): boolean;
