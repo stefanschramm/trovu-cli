@@ -9,7 +9,8 @@
     "test": "npx jest --verbose src/",
     "coverage": "npx jest --verbose --coverage src/",
     "lint": "npx eslint src/",
-    "prettier": "npx prettier src/ --check"
+    "prettier": "npx prettier src/ --check",
+    "prettier-fix": "npx prettier src/ --write"
   },
   "type": "module",
   "bin": {

@@ -24,7 +24,12 @@ export interface ShortcutDatabase {
   /**
    * @param language Language to use when replacing search keys of includes
    */
-  getShortcut(keyword: string, argumentCount: number, language: string, namespaces: NamespaceSource[]): Shortcut | undefined;
+  getShortcut(
+    keyword: string,
+    argumentCount: number,
+    language: string,
+    namespaces: NamespaceSource[],
+  ): Shortcut | undefined;
 }
 
 export type IncludeDefinition = SimpleIncludeDefinition | NamespaceIncludeDefinition[];

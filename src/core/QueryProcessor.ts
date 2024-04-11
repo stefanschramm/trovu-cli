@@ -16,10 +16,7 @@ export class QueryProcessor {
     // TODO: Where is country used? - Only in UrlProcesor/PlaceholderProcessor?
     // const country = parsedQuery.country ?? this.environment.getCountry();
     const language = parsedQuery.language ?? this.environment.getLanguage();
-    const allNamespaces = [
-      ...this.environment.getNamespaces(),
-      ...parsedQuery.additionalNamespaces,
-    ];
+    const allNamespaces = [...this.environment.getNamespaces(), ...parsedQuery.additionalNamespaces];
     const namespaces = allNamespaces.filter((value, index) => allNamespaces.indexOf(value) === index); // make unique TODO: does === work for all?
 
     const shortcut = this.database.getShortcut(parsedQuery.keyword, parsedQuery.args.length, language, namespaces);

@@ -8,9 +8,7 @@ import yaml from 'yaml';
 export class LocalIndividualNamespaceSourceHandler implements NamespaceSourceHandler {
   private readonly cache: Record<string, Record<string, Shortcut>> = {};
 
-  public constructor(
-    private readonly path: string,
-  ) {}
+  public constructor(private readonly path: string) {}
 
   public supports(source: NamespaceSource): boolean {
     return typeof source === 'string';

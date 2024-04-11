@@ -7,11 +7,14 @@ import { IncludeDefinition, Shortcut, ShortcutDatabase } from './Shortcut.js';
  * Shortcut database that is based on a hierarchy of JavaScript objects grouped by namespaces (classical Trovu YAML data)
  */
 export class ObjectShortcutDatabase implements ShortcutDatabase {
-  constructor(
-    private readonly namespaceDispatcher: NamespaceDispatcher,
-  ) {}
+  constructor(private readonly namespaceDispatcher: NamespaceDispatcher) {}
 
-  public getShortcut(keyword: string, argumentCount: number, language: string, namespaces: NamespaceSource[]): Shortcut | undefined {
+  public getShortcut(
+    keyword: string,
+    argumentCount: number,
+    language: string,
+    namespaces: NamespaceSource[],
+  ): Shortcut | undefined {
     const searchKey = `${keyword} ${argumentCount}`;
     const finder = new ShortcutFinder(namespaces, this.namespaceDispatcher, language);
 
