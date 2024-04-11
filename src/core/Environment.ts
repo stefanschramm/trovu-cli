@@ -1,4 +1,4 @@
-import { Shortcut } from './database/Shortcut.js';
+import { RawShortcut } from './database/Shortcut.js';
 
 export interface Environment {
   getCountry(): string;
@@ -9,36 +9,19 @@ export interface Environment {
   getNamespaces(): NamespaceSource[];
 }
 
-export type NamespaceSource = {
-  name?: string;
-} & (
-  | OfficialNamespaceSource
-  | UrlNamespaceSource
-  | GithubNamespaceSource
-  | FileNamespaceSource
-  | StaticNamespaceSource
-);
+export type NamespaceSource = OfficialNamespaceSource | ComplexNamespaceSource;
 
 type OfficialNamespaceSource = string;
 
-type UrlNamespaceSource = {
+type ComplexNamespaceSource = {
+  readonly name?: string;
   readonly url?: string;
-};
-
-type GithubNamespaceSource = {
   readonly github?: string;
+  readonly file?: string;
+  readonly shortcuts?: ShortcutSearchKeyMap;
 };
 
-/** Special type for trovu-cli only */
-type FileNamespaceSource = {
-  file: ShortcutSearchKeyMap;
-};
-
-type StaticNamespaceSource = {
-  shortcuts: ShortcutSearchKeyMap;
-};
-
-type ShortcutSearchKeyMap = Record<string, Shortcut>;
+export type ShortcutSearchKeyMap = Record<string, RawShortcut>;
 
 /**
  * Common Environment dummy for unit tests

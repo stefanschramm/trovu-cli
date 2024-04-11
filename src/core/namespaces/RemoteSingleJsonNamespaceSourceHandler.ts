@@ -1,13 +1,12 @@
-import { NamespaceSource } from '../Environment.js';
+import { NamespaceSource, ShortcutSearchKeyMap } from '../Environment.js';
 import { NamespaceSourceHandler } from './NamespaceDispatcher.js';
-import { RawShortcut } from '../database/Shortcut.js';
 import { ImplementationError } from '../../Error.js';
 
 /**
  * This handler is supposed to be used with Trovu's "copiled" JSON shortcut database
  */
 export class RemoteSingleJsonNamespaceSourceHandler implements NamespaceSourceHandler {
-  private cache: Record<string, Record<string, RawShortcut>> = {};
+  private cache: Record<string, ShortcutSearchKeyMap> = {};
 
   /**
    * @param url Example: https://trovu.net/data.json
@@ -18,7 +17,7 @@ export class RemoteSingleJsonNamespaceSourceHandler implements NamespaceSourceHa
     return typeof source === 'string';
   }
 
-  public async get(source: NamespaceSource): Promise<Record<string, RawShortcut>> {
+  public async get(source: NamespaceSource): Promise<ShortcutSearchKeyMap> {
     if (typeof source !== 'string') {
       throw new ImplementationError('NamespaceSource not supported by RemoteSingleNamespaceSourceHandler.');
     }

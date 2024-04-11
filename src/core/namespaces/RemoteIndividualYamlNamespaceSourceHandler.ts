@@ -1,6 +1,5 @@
-import { NamespaceSource } from '../Environment.js';
+import { NamespaceSource, ShortcutSearchKeyMap } from '../Environment.js';
 import { NamespaceSourceHandler } from './NamespaceDispatcher.js';
-import { RawShortcut } from '../database/Shortcut.js';
 import { DataDefinitionError, ImplementationError, UsageError } from '../../Error.js';
 import yaml from 'yaml';
 
@@ -8,7 +7,7 @@ import yaml from 'yaml';
  * This handler is slow because it fetches every namespace individually, but it can be used to directly test public repositories.
  */
 export class RemoteIndividualYamlNamespaceSourceHandler implements NamespaceSourceHandler {
-  private readonly cache: Record<string, Record<string, RawShortcut>> = {};
+  private readonly cache: Record<string, ShortcutSearchKeyMap> = {};
 
   /**
    * @param baseUrl Example: https://raw.githubusercontent.com/trovu/trovu/master/data/shortcuts/
@@ -19,7 +18,7 @@ export class RemoteIndividualYamlNamespaceSourceHandler implements NamespaceSour
     return typeof source === 'string';
   }
 
-  public async get(source: NamespaceSource): Promise<Record<string, RawShortcut>> {
+  public async get(source: NamespaceSource): Promise<ShortcutSearchKeyMap> {
     if (typeof source !== 'string') {
       throw new ImplementationError('NamespaceSource not supported by RemoteIndividualNamespaceSourceHandler.');
     }

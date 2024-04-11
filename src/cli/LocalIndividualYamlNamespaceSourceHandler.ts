@@ -1,12 +1,11 @@
-import { NamespaceSource } from '../core/Environment.js';
+import { NamespaceSource, ShortcutSearchKeyMap } from '../core/Environment.js';
 import { NamespaceSourceHandler } from '../core/namespaces/NamespaceDispatcher.js';
-import { RawShortcut } from '../core/database/Shortcut.js';
 import { DataDefinitionError, ImplementationError, UsageError } from '../Error.js';
 import fs from 'fs';
 import yaml from 'yaml';
 
 export class LocalIndividualYamlNamespaceSourceHandler implements NamespaceSourceHandler {
-  private readonly cache: Record<string, Record<string, RawShortcut>> = {};
+  private readonly cache: Record<string, ShortcutSearchKeyMap> = {};
 
   public constructor(private readonly path: string) {}
 
@@ -14,7 +13,7 @@ export class LocalIndividualYamlNamespaceSourceHandler implements NamespaceSourc
     return typeof source === 'string';
   }
 
-  public async get(source: NamespaceSource): Promise<Record<string, RawShortcut>> {
+  public async get(source: NamespaceSource): Promise<ShortcutSearchKeyMap> {
     if (typeof source !== 'string') {
       throw new ImplementationError('NamespaceSource not supported by LocalIndividualNamespaceSourceHandler.');
     }
