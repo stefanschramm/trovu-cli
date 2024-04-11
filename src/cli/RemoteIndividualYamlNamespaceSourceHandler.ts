@@ -2,13 +2,18 @@ import { NamespaceSource } from '../core/Environment.js';
 import { NamespaceSourceHandler } from '../core/NamespaceDispatcher.js';
 import { RawShortcut } from '../core/database/Shortcut.js';
 import { DataDefinitionError, ImplementationError, UsageError } from '../Error.js';
-import fs from 'fs';
 import yaml from 'yaml';
 
-export class LocalIndividualNamespaceSourceHandler implements NamespaceSourceHandler {
+/**
+ * This handler is slow because it fetches every namespace individually, but it can be used to directly test public repositories.
+ */
+export class RemoteIndividualYamlNamespaceSourceHandler implements NamespaceSourceHandler {
   private readonly cache: Record<string, Record<string, RawShortcut>> = {};
 
-  public constructor(private readonly path: string) {}
+  /**
+   * @param baseUrl Example: https://raw.githubusercontent.com/trovu/trovu/master/data/shortcuts/
+   */
+  public constructor(private readonly baseUrl: string) {}
 
   public supports(source: NamespaceSource): boolean {
     return typeof source === 'string';
@@ -16,7 +21,7 @@ export class LocalIndividualNamespaceSourceHandler implements NamespaceSourceHan
 
   public async get(source: NamespaceSource): Promise<Record<string, RawShortcut>> {
     if (typeof source !== 'string') {
-      throw new ImplementationError('NamespaceSource not supported by LocalIndividualNamespaceSourceHandler.');
+      throw new ImplementationError('NamespaceSource not supported by RemoteIndividualNamespaceSourceHandler.');
     }
 
     if (this.cache[source] === undefined) {
@@ -28,7 +33,10 @@ export class LocalIndividualNamespaceSourceHandler implements NamespaceSourceHan
 
   private async load(namespace: string): Promise<void> {
     try {
-      const content = (await fs.promises.readFile(`${this.path}/${namespace}.yml`)).toString();
+      const url = `${this.baseUrl}/${namespace}.yml`;
+      console.log(`Loading ${url}...`);
+      const response = await fetch(url);
+      const content = await response.text();
       const namespaceData = yaml.parse(content);
       this.cache[namespace] = namespaceData;
     } catch (e) {

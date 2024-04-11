@@ -8,6 +8,7 @@ const testCliConfig: CliConfig = {
   browser: 'dontcare',
   shortcutsDir: 'dontcare',
   singleDataSourceUrl: 'https://trovu.net/data.json',
+  individualShortcutsBaseUrl: 'https://raw.githubusercontent.com/trovu/trovu/master/data/shortcuts/',
 };
 
 test('getNamespaces', () => {

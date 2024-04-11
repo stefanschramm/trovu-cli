@@ -13,6 +13,7 @@ export type CliConfig = {
   readonly browser: string;
   readonly shortcutsDir: string;
   readonly singleDataSourceUrl: string;
+  readonly individualShortcutsBaseUrl: string;
 };
 
 /*
@@ -72,6 +73,7 @@ function getDefaultConfig(): CliConfig {
     browser: 'open', // TODO: open is xdg-open. Check if this works on other OSes.
     shortcutsDir: `${here}/../../data/shortcuts`,
     singleDataSourceUrl: 'https://trovu.net/data.json',
+    individualShortcutsBaseUrl: 'https://raw.githubusercontent.com/trovu/trovu/master/data/shortcuts/', // TODO: maybe pattern instead of base url would be better
   };
 }
 
