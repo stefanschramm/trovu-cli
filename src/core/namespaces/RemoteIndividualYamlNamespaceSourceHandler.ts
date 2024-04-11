@@ -4,6 +4,8 @@ import { DataDefinitionError, ImplementationError, UsageError } from '../../Erro
 import yaml from 'yaml';
 
 /**
+ * Handler for official namespaces
+ *
  * This handler is slow because it fetches every namespace individually, but it can be used to directly test public repositories.
  */
 export class RemoteIndividualYamlNamespaceSourceHandler implements NamespaceSourceHandler {

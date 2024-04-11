@@ -9,6 +9,8 @@ import { NamespaceDispatcher } from '../core/namespaces/NamespaceDispatcher.js';
 import { ObjectShortcutDatabase } from '../core/database/ObjectShortcutDatabase.js';
 import { LocalIndividualYamlNamespaceSourceHandler } from './LocalIndividualYamlNamespaceSourceHandler.js';
 import { InPlaceNamespaceSourceHandler } from '../core/namespaces/InPlaceNamespaceSourceHandler.js';
+import { UrlNamespaceSourceHandler } from '../core/namespaces/UrlNamespaceSourceHandler.js';
+import { GithubNamespaceSourceHandler } from '../core/namespaces/GithubNamespaceSourceHandler.js';
 
 async function main(): Promise<void> {
   if (process.argv.length < 3) {
@@ -30,10 +32,11 @@ async function main(): Promise<void> {
     const cliEnvironment = new CliEnvironment(cliConfig);
     const namespaceDispatcher = new NamespaceDispatcher([
       new LocalIndividualYamlNamespaceSourceHandler(cliConfig.shortcutsDir),
-      new InPlaceNamespaceSourceHandler(),
       // new RemoteSingleJsonNamespaceSourceHandler(cliConfig.singleDataSourceUrl),
       // new RemoteIndividualYamlNamespaceSourceHandler(cliConfig.individualShortcutsBaseUrl),
-      // TODO: Add handler for GitHub and In-Place namespace definitions
+      new InPlaceNamespaceSourceHandler(),
+      new UrlNamespaceSourceHandler(),
+      new GithubNamespaceSourceHandler(),
     ]);
     const shortcutDatabase = new ObjectShortcutDatabase(namespaceDispatcher);
     const queryProcessor = new QueryProcessor(cliEnvironment, shortcutDatabase);

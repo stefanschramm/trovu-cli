@@ -3,6 +3,8 @@ import { NamespaceSourceHandler } from './NamespaceDispatcher.js';
 import { ImplementationError } from '../../Error.js';
 
 /**
+ * Handler for official namespaces
+ *
  * This handler is supposed to be used with Trovu's "copiled" JSON shortcut database
  */
 export class RemoteSingleJsonNamespaceSourceHandler implements NamespaceSourceHandler {
