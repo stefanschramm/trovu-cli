@@ -1,11 +1,13 @@
+import { CliConfig } from './CliConfig.js';
 import { CliEnvironment } from './CliEnvironment.js';
 
-const testCliConfig = {
+const testCliConfig: CliConfig = {
   namespaces: ['o', 'aa', '.bb'],
   country: 'aa',
   language: 'bb',
   browser: 'dontcare',
   shortcutsDir: 'dontcare',
+  singleDataSourceUrl: 'https://trovu.net/data.json',
 };
 
 test('getNamespaces', () => {
