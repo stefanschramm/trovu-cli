@@ -14,21 +14,21 @@ export class LocalIndividualNamespaceSourceHandler implements NamespaceSourceHan
     return typeof source === 'string';
   }
 
-  public get(source: NamespaceSource): Record<string, Shortcut> {
+  public async get(source: NamespaceSource): Promise<Record<string, Shortcut>> {
     if (typeof source !== 'string') {
       throw new ImplementationError('NamespaceSource not supported by LocalIndividualNamespaceSourceHandler.');
     }
 
     if (this.cache[source] === undefined) {
-      this.load(source);
+      await this.load(source);
     }
 
     return this.cache[source];
   }
 
-  private load(namespace: string): void {
+  private async load(namespace: string): Promise<void> {
     try {
-      const content = fs.readFileSync(`${this.path}/${namespace}.yml`).toString();
+      const content = (await fs.promises.readFile(`${this.path}/${namespace}.yml`)).toString();
       const namespaceData = yaml.parse(content);
       this.cache[namespace] = namespaceData;
     } catch (e) {

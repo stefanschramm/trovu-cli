@@ -10,7 +10,7 @@ export class QueryProcessor {
     private readonly database: ShortcutDatabase,
   ) {}
 
-  public process(query: string): QueryProcessingResult {
+  public async process(query: string): Promise<QueryProcessingResult> {
     const queryParser = new QueryParser();
     const parsedQuery = queryParser.parse(query);
     // TODO: Where is country used? - Only in UrlProcesor/PlaceholderProcessor?
@@ -19,7 +19,12 @@ export class QueryProcessor {
     const allNamespaces = [...this.environment.getNamespaces(), ...parsedQuery.additionalNamespaces];
     const namespaces = allNamespaces.filter((value, index) => allNamespaces.indexOf(value) === index); // make unique TODO: does === work for all?
 
-    const shortcut = this.database.getShortcut(parsedQuery.keyword, parsedQuery.args.length, language, namespaces);
+    const shortcut = await this.database.getShortcut(
+      parsedQuery.keyword,
+      parsedQuery.args.length,
+      language,
+      namespaces,
+    );
 
     if (shortcut === undefined) {
       return { status: QueryProcessingResultStatus.NotFound };

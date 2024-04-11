@@ -14,7 +14,7 @@ const secondDummyShortcut = {
   url: 'http://example.com/2',
 };
 
-test('getShortcut considers argument count', () => {
+test('getShortcut considers argument count', async () => {
   const dispatcher = createNamespaceDispatcher({
     first: {
       'a 1': firstDummyShortcut,
@@ -23,24 +23,24 @@ test('getShortcut considers argument count', () => {
   });
   const database = new ObjectShortcutDatabase(dispatcher);
 
-  const shortcut = database.getShortcut('a', 2, 'de', ['first']);
+  const shortcut = await database.getShortcut('a', 2, 'de', ['first']);
 
   expect(shortcut).toEqual(secondDummyShortcut);
 });
 
-test('getShortcut considers namespace priority', () => {
+test('getShortcut considers namespace priority', async () => {
   const dispatcher = createNamespaceDispatcher({
     first: { 'a 1': firstDummyShortcut },
     second: { 'a 1': secondDummyShortcut },
   });
   const database = new ObjectShortcutDatabase(dispatcher);
 
-  const shortcut = database.getShortcut('a', 1, 'de', ['second', 'first']);
+  const shortcut = await database.getShortcut('a', 1, 'de', ['second', 'first']);
 
   expect(shortcut).toEqual(secondDummyShortcut);
 });
 
-test('getShortcut processes include attribute', () => {
+test('getShortcut processes include attribute', async () => {
   const dispatcher = createNamespaceDispatcher({
     first: {
       'a 1': {
@@ -54,7 +54,7 @@ test('getShortcut processes include attribute', () => {
   });
   const database = new ObjectShortcutDatabase(dispatcher);
 
-  const shortcut = database.getShortcut('a', 1, 'de', ['first']);
+  const shortcut = await database.getShortcut('a', 1, 'de', ['first']);
 
   expect(shortcut).toEqual({
     // title of "a 1" but url of "b 1"
@@ -63,7 +63,7 @@ test('getShortcut processes include attribute', () => {
   });
 });
 
-test('getShortcut processes include list attribute', () => {
+test('getShortcut processes include list attribute', async () => {
   const dispatcher = createNamespaceDispatcher({
     first: {
       'a 1': {
@@ -89,7 +89,7 @@ test('getShortcut processes include list attribute', () => {
   });
   const database = new ObjectShortcutDatabase(dispatcher);
 
-  const shortcut = database.getShortcut('a', 1, 'de', ['first']);
+  const shortcut = await database.getShortcut('a', 1, 'de', ['first']);
 
   expect(shortcut).toEqual({
     // title of "a 1" but url of "b 1" of second (not third!) namespace
@@ -98,7 +98,7 @@ test('getShortcut processes include list attribute', () => {
   });
 });
 
-test('getShortcut processes include list attribute and returns undefined if include was not found', () => {
+test('getShortcut processes include list attribute and returns undefined if include was not found', async () => {
   const dispatcher = createNamespaceDispatcher({
     first: {
       'a 1': {
@@ -115,23 +115,23 @@ test('getShortcut processes include list attribute and returns undefined if incl
   });
   const database = new ObjectShortcutDatabase(dispatcher);
 
-  const shortcut = database.getShortcut('a', 1, 'de', ['first']);
+  const shortcut = await database.getShortcut('a', 1, 'de', ['first']);
 
   expect(shortcut).toBeUndefined();
 });
 
-test('getShortcut returns undefined when shortcut is not found', () => {
+test('getShortcut returns undefined when shortcut is not found', async () => {
   const dispatcher = createNamespaceDispatcher({
     first: { 'a 1': firstDummyShortcut },
   });
   const database = new ObjectShortcutDatabase(dispatcher);
 
-  const shortcut = database.getShortcut('unknownkeyword', 1, 'de', ['first']);
+  const shortcut = await database.getShortcut('unknownkeyword', 1, 'de', ['first']);
 
   expect(shortcut).toEqual(undefined);
 });
 
-test('getShortcut throws exception on circular includes', () => {
+test('getShortcut throws exception on circular includes', async () => {
   const dispatcher = createNamespaceDispatcher({
     first: {
       'a 1': {
@@ -150,23 +150,28 @@ test('getShortcut throws exception on circular includes', () => {
   });
   const database = new ObjectShortcutDatabase(dispatcher);
 
-  expect(() => database.getShortcut('a', 1, 'de', ['first'])).toThrow(DataDefinitionError);
+  expect.assertions(1);
+  try {
+    await database.getShortcut('a', 1, 'de', ['first']);
+  } catch (error) {
+    expect(error).toBeInstanceOf(DataDefinitionError);
+  }
 });
 
 function createNamespaceDispatcher(data: Record<string, Record<string, Shortcut>>) {
-  const namespaceSourceHandler = new NamespaceSourceHandlerStrub(data);
+  const namespaceSourceHandler = new NamespaceSourceHandlerStub(data);
 
   return new NamespaceDispatcher([namespaceSourceHandler]);
 }
 
-class NamespaceSourceHandlerStrub implements NamespaceSourceHandler {
+class NamespaceSourceHandlerStub implements NamespaceSourceHandler {
   public constructor(private readonly data: Record<string, Record<string, Shortcut>>) {}
 
   public supports(source: NamespaceSource): boolean {
     return typeof source === 'string';
   }
 
-  public get(source: NamespaceSource): Record<string, Shortcut> {
+  public async get(source: NamespaceSource): Promise<Record<string, Shortcut>> {
     if (typeof source !== 'string') {
       throw new ImplementationError('source is expected to be a string.');
     }

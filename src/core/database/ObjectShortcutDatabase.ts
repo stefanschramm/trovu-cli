@@ -9,16 +9,16 @@ import { IncludeDefinition, Shortcut, ShortcutDatabase } from './Shortcut.js';
 export class ObjectShortcutDatabase implements ShortcutDatabase {
   constructor(private readonly namespaceDispatcher: NamespaceDispatcher) {}
 
-  public getShortcut(
+  public async getShortcut(
     keyword: string,
     argumentCount: number,
     language: string,
     namespaces: NamespaceSource[],
-  ): Shortcut | undefined {
+  ): Promise<Shortcut | undefined> {
     const searchKey = `${keyword} ${argumentCount}`;
     const finder = new ShortcutFinder(namespaces, this.namespaceDispatcher, language);
 
-    return finder.getShortcutBySearchKey(searchKey);
+    return await finder.getShortcutBySearchKey(searchKey);
   }
 }
 
@@ -30,11 +30,11 @@ class ShortcutFinder {
     private readonly language: string,
   ) {}
 
-  public getShortcutBySearchKey(
+  public async getShortcutBySearchKey(
     searchKey: string,
     overrideNamespaces: NamespaceSource[] | undefined = undefined,
     maxDepth = 10,
-  ): Shortcut | undefined {
+  ): Promise<Shortcut | undefined> {
     if (maxDepth <= 0) {
       throw new DataDefinitionError(`Possible circular inclusion detected for searchKey "${searchKey}".`);
     }
@@ -42,13 +42,17 @@ class ShortcutFinder {
     const namespacesToSearchIn = overrideNamespaces === undefined ? this.namespaces : overrideNamespaces;
 
     for (const namespace of namespacesToSearchIn) {
-      let shortcut = this.namespaceDispatcher.get(namespace)[searchKey];
+      let shortcut = (await this.namespaceDispatcher.get(namespace))[searchKey];
       if (shortcut === undefined) {
         continue; // look in next namespace
       }
 
       if (shortcut.include !== undefined) {
-        const includedShortcut = this.getShortcutByIncludeDefinition(shortcut.include, overrideNamespaces, --maxDepth);
+        const includedShortcut = await this.getShortcutByIncludeDefinition(
+          shortcut.include,
+          overrideNamespaces,
+          --maxDepth,
+        );
         if (includedShortcut === undefined) {
           // We don't return partial shortcuts (for example title without url would be useless).
           return undefined;
@@ -68,15 +72,15 @@ class ShortcutFinder {
     return undefined; // keyword not found
   }
 
-  private getShortcutByIncludeDefinition(
+  private async getShortcutByIncludeDefinition(
     include: IncludeDefinition,
     overrideNamespaces: NamespaceSource[] | undefined,
     maxDepth = 10,
-  ): Shortcut | undefined {
+  ): Promise<Shortcut | undefined> {
     if (include instanceof Array) {
       // List of references by namespace - namespace to search in comes from include, not from usual namespace priority list
       for (const includeEntry of include) {
-        const referencedShortcut = this.getShortcutBySearchKey(
+        const referencedShortcut = await this.getShortcutBySearchKey(
           this.mapSearchKey(includeEntry.key),
           [includeEntry.namespace],
           maxDepth,
@@ -88,7 +92,7 @@ class ShortcutFinder {
       return undefined;
     } else {
       // One single shortcut
-      return this.getShortcutBySearchKey(this.mapSearchKey(include.key), overrideNamespaces, maxDepth);
+      return await this.getShortcutBySearchKey(this.mapSearchKey(include.key), overrideNamespaces, maxDepth);
     }
   }
 

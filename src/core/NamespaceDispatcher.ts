@@ -4,16 +4,16 @@ import { Shortcut } from './database/Shortcut.js';
 
 export interface NamespaceSourceHandler {
   supports(source: NamespaceSource): boolean;
-  get(source: NamespaceSource): Record<string, Shortcut>;
+  get(source: NamespaceSource): Promise<Record<string, Shortcut>>;
 }
 
 export class NamespaceDispatcher {
   public constructor(private readonly namespaceSourceHandlers: NamespaceSourceHandler[]) {}
 
-  public get(source: NamespaceSource): Record<string, Shortcut> {
+  public async get(source: NamespaceSource): Promise<Record<string, Shortcut>> {
     for (const namespaceSourceHandler of this.namespaceSourceHandlers) {
       if (namespaceSourceHandler.supports(source)) {
-        return namespaceSourceHandler.get(source);
+        return await namespaceSourceHandler.get(source);
       }
     }
 

@@ -9,7 +9,7 @@ import { LocalIndividualNamespaceSourceHandler } from './LocalIndividualNamespac
 import { NamespaceDispatcher } from '../core/NamespaceDispatcher.js';
 import { ObjectShortcutDatabase } from '../core/database/ObjectShortcutDatabase.js';
 
-function main(): void {
+async function main(): Promise<void> {
   if (process.argv.length < 3) {
     console.error(`Usage: trovu-cli <command>`);
     return;
@@ -35,7 +35,7 @@ function main(): void {
     const queryProcessor = new QueryProcessor(cliEnvironment, shortcutDatabase);
 
     console.log(`Processing query "${query}"...`);
-    const result = queryProcessor.process(query);
+    const result = await queryProcessor.process(query);
 
     switch (result.status) {
       case QueryProcessingResultStatus.Success: {
@@ -77,4 +77,4 @@ function main(): void {
   }
 }
 
-main();
+await main();

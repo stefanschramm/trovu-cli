@@ -4,7 +4,7 @@ import { Shortcut, ShortcutDatabase } from './Shortcut.js';
  * Dummy for usage in unit tests
  */
 export class ShortcutDatabaseDummy implements ShortcutDatabase {
-  getShortcut(keyword: string, argumentCount: number): Shortcut | undefined {
+  public async getShortcut(keyword: string, argumentCount: number): Promise<Shortcut | undefined> {
     if (keyword === 'bvg' && argumentCount === 2) {
       return {
         url: 'https://www.bvg.de/de/verbindungen/verbindungssuche?S=<Start>&Z=<Ziel>&start=1',

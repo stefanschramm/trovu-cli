@@ -29,7 +29,7 @@ export interface ShortcutDatabase {
     argumentCount: number,
     language: string,
     namespaces: NamespaceSource[],
-  ): Shortcut | undefined;
+  ): Promise<Shortcut | undefined>;
 }
 
 export type IncludeDefinition = SimpleIncludeDefinition | NamespaceIncludeDefinition[];
