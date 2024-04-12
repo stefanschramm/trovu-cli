@@ -28,6 +28,8 @@ export type ShortcutSearchKeyMap = Record<string, RawShortcut>;
  * Common Environment dummy for unit tests
  */
 export class EnvironmentDummy implements Environment {
+  public constructor(private readonly defaultKeyword: string | undefined = undefined) {}
+
   public getNamespaces(): NamespaceSource[] {
     return ['o', 'de', '.de'];
   }
@@ -41,6 +43,6 @@ export class EnvironmentDummy implements Environment {
   }
 
   public getDefaultKeyword(): string | undefined {
-    return undefined;
+    return this.defaultKeyword;
   }
 }

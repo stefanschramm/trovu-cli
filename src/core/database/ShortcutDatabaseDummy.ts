@@ -49,6 +49,13 @@ export class ShortcutDatabaseDummy implements ShortcutDatabase {
       };
     }
 
+    if (keyword === 'exampledefault' && argumentCount === 1) {
+      return {
+        url: 'https://example.com/?query=<query>',
+        title: 'Example Default Keyword',
+      };
+    }
+
     return undefined;
   }
 }

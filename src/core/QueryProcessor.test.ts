@@ -19,6 +19,13 @@ test('process unknown keyword', async () => {
   expect(result.url).toBe(undefined);
 });
 
+test('process unknown keyword with configured default keyword', async () => {
+  const result = await getQueryProcessor('exampledefault').process('nonexistingkeyword blah example');
+
+  expect(result.status).toBe(QueryProcessingResultStatus.Success);
+  expect(result.url).toBe('https://example.com/?query=nonexistingkeyword blah example');
+});
+
 test('process deprecated shortcut', async () => {
   const result = await getQueryProcessor().process('behvaugeh Alexanderplatz, Hermannplatz');
 
@@ -62,6 +69,6 @@ test('process with non-deprecated shourtcut without url throws exception', async
   }
 });
 
-function getQueryProcessor() {
-  return new QueryProcessor(new EnvironmentDummy(), new ShortcutDatabaseDummy());
+function getQueryProcessor(defaultKeyword: string | undefined = undefined): QueryProcessor {
+  return new QueryProcessor(new EnvironmentDummy(defaultKeyword), new ShortcutDatabaseDummy());
 }
