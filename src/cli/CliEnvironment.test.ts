@@ -9,6 +9,7 @@ const testCliConfig: CliConfig = {
   shortcutsDir: 'dontcare',
   singleDataSourceUrl: 'https://trovu.net/data.json',
   individualShortcutsBaseUrl: 'https://raw.githubusercontent.com/trovu/trovu/master/data/shortcuts/',
+  defaultKeyword: 'g',
 };
 
 test('getNamespaces', () => {
@@ -27,4 +28,10 @@ test('getLanguage', () => {
   const cliEnvironment = new CliEnvironment(testCliConfig);
 
   expect(cliEnvironment.getLanguage()).toEqual('bb');
+});
+
+test('getDefaultKeyword', () => {
+  const cliEnvironment = new CliEnvironment(testCliConfig);
+
+  expect(cliEnvironment.getDefaultKeyword()).toEqual('g');
 });
