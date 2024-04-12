@@ -41,7 +41,7 @@ test('parse extracts additional namespaces', () => {
   });
 });
 
-test('parse recognized 0-argument queries', () => {
+test('parse recognizes 0-argument queries', () => {
   const query = 'w';
   const parser = new QueryParser();
 
