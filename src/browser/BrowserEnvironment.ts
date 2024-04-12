@@ -14,4 +14,8 @@ export class BrowserEnvironment implements Environment {
   public getLanguage(): string {
     return 'de';
   }
+
+  public getDefaultKeyword(): string | undefined {
+    return undefined;
+  }
 }

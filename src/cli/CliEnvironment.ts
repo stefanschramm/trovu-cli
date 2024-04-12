@@ -15,4 +15,8 @@ export class CliEnvironment implements Environment {
   public getLanguage(): string {
     return this.cliConfig.language;
   }
+
+  public getDefaultKeyword(): string | undefined {
+    return this.cliConfig.defaultKeyword;
+  }
 }

@@ -7,38 +7,23 @@ import { fileURLToPath } from 'url';
 import { NamespaceSource } from '../core/Environment';
 
 export type CliConfig = {
-  readonly namespaces: NamespaceSource[];
-  readonly country: string;
-  readonly language: string;
   readonly browser: string;
   readonly shortcutsDir: string;
   readonly singleDataSourceUrl: string;
   readonly individualShortcutsBaseUrl: string;
+} & TrovuConfig;
+
+/**
+ * Trovu config as described in https://trovu.net/docs/users/advanced/
+ *
+ * Example: https://github.com/trovu/trovu-data-user/blob/master/config.yml
+ */
+type TrovuConfig = {
+  readonly namespaces: NamespaceSource[];
+  readonly language: string;
+  readonly country: string;
+  readonly defaultKeyword?: string | undefined;
 };
-
-/*
-
-TODO: Make CliConfig compatible to config.yml as described here:
-
-- https://trovu.net/docs/users/advanced/
-- https://github.com/trovu/trovu-data-user/blob/master/config.yml
-
-namespaces:
-- o
-- en
-- .us
-- github: .
-  name: my
-# defaultKeyword: g 
-language: en
-country: us
-
-For the CLI version we could add:
-
-- file: /path/to/shortcuts.yml
-  name: examplename
-
-*/
 
 export function getCliConfig(configFile: string | undefined = undefined): CliConfig {
   let effectiveConfigFile: string | undefined;
@@ -74,19 +59,6 @@ function getDefaultConfig(): CliConfig {
     shortcutsDir: `${here}/../../data/shortcuts`,
     singleDataSourceUrl: 'https://trovu.net/data.json',
     individualShortcutsBaseUrl: 'https://raw.githubusercontent.com/trovu/trovu/master/data/shortcuts/', // TODO: maybe pattern instead of base url would be better
+    defaultKeyword: undefined,
   };
 }
-
-// @ts-expect-error TODO: Refactor config format to match trovu's config.yml as good as possible
-// eslint-disable-next-line
-type TrovuCliConfig = {
-  browser: string;
-  officialNamespacesDir: string;
-} & TrovuConfig;
-
-type TrovuConfig = {
-  readonly namespaces: NamespaceSource[];
-  readonly language: string;
-  readonly country: string;
-  readonly defaultKeyword: string | undefined;
-};

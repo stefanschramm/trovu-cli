@@ -7,6 +7,7 @@ export interface Environment {
    * Namespaces in ascending priority (lowest first)
    */
   getNamespaces(): NamespaceSource[];
+  getDefaultKeyword(): string | undefined;
 }
 
 export type NamespaceSource = OfficialNamespaceSource | ComplexNamespaceSource;
@@ -37,5 +38,9 @@ export class EnvironmentDummy implements Environment {
 
   public getLanguage(): string {
     return 'de';
+  }
+
+  public getDefaultKeyword(): string | undefined {
+    return undefined;
   }
 }

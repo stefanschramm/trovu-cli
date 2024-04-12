@@ -1,7 +1,7 @@
 import { type Environment } from './Environment.js';
 import { QueryParser } from './QueryParser.js';
 import { UrlProcessor } from './url/UrlProcessor.js';
-import { DataDefinitionError } from '../Error.js';
+import { DataDefinitionError, UsageError } from '../Error.js';
 import { ShortcutDatabase } from './database/ShortcutDatabase.js';
 
 export class QueryProcessor {
@@ -27,6 +27,13 @@ export class QueryProcessor {
     );
 
     if (shortcut === undefined) {
+      const defaultKeyword = this.environment.getDefaultKeyword();
+      if (defaultKeyword !== undefined) {
+        return this.processDefaultKeyword(defaultKeyword, query);
+      }
+    }
+
+    if (shortcut === undefined) {
       return { status: QueryProcessingResultStatus.NotFound };
     }
 
@@ -49,6 +56,33 @@ export class QueryProcessor {
     const urlProcessor = new UrlProcessor(language);
 
     const targetUrl = urlProcessor.process(shortcut.url, parsedQuery.args);
+
+    return {
+      status: QueryProcessingResultStatus.Success,
+      url: targetUrl,
+    };
+  }
+
+  private async processDefaultKeyword(defaultKeyword: string, query: string): Promise<QueryProcessingResult> {
+    const defaultShortcut = await this.database.getShortcut(
+      defaultKeyword,
+      1,
+      this.environment.getLanguage(),
+      this.environment.getNamespaces(),
+    );
+
+    if (defaultShortcut === undefined) {
+      throw new UsageError(`Default shortcut "${defaultKeyword}" was not found.`);
+    }
+
+    if (defaultShortcut.url === undefined) {
+      throw new DataDefinitionError('defaultShortcut.url was undefined although the result was not deprecated!?');
+    }
+
+    const urlProcessor = new UrlProcessor(this.environment.getLanguage());
+
+    // here the complete (un-parsed) query is used as a single argument
+    const targetUrl = urlProcessor.process(defaultShortcut.url, [query]);
 
     return {
       status: QueryProcessingResultStatus.Success,
