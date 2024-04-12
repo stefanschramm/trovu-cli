@@ -48,6 +48,13 @@ class ShortcutFinder {
         continue; // look in next namespace
       }
 
+      if (typeof shortcut === 'string') {
+        // short string-only notation (not used in official namespaces)
+        return {
+          url: replaceLegacyUrlPlaceholders(shortcut),
+        };
+      }
+
       if (shortcut.include !== undefined) {
         const includedShortcut = await this.getShortcutByIncludeDefinition(
           shortcut.include,
@@ -100,4 +107,15 @@ class ShortcutFinder {
   private mapSearchKey(searchKey: string): string {
     return searchKey.replace('<$language>', this.language);
   }
+}
+
+function replaceLegacyUrlPlaceholders(url: string): string {
+  const placeholderRe = /{%([^}]+)}/g;
+  let replacedUrl = url;
+  for (const match of replacedUrl.matchAll(placeholderRe)) {
+    console.log('match:', match);
+    replacedUrl = replacedUrl.replace(match[0], `<${match[1]}>`);
+  }
+
+  return replacedUrl;
 }
