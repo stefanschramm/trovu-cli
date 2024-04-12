@@ -40,3 +40,16 @@ test('parse extracts additional namespaces', () => {
     language: 'en',
   });
 });
+
+test('parse recognized 0-argument queries', () => {
+  const query = 'w';
+  const parser = new QueryParser();
+
+  const result = parser.parse(query);
+
+  expect(result).toEqual({
+    additionalNamespaces: [],
+    keyword: 'w',
+    args: [],
+  });
+});

@@ -6,11 +6,8 @@ export class QueryParser {
     const queryParts = query.split(' ');
     const keywordParts = queryParts[0].split('.');
     const keyword = keywordParts[keywordParts.length - 1];
-    const args = queryParts
-      .slice(1)
-      .join(' ')
-      .split(',')
-      .map((keyword: string) => keyword.trim());
+    const argumentParts = queryParts.slice(1).join(' ').trim();
+    const args = argumentParts === '' ? [] : argumentParts.split(',').map((keyword: string) => keyword.trim());
     let language: string | undefined = undefined;
     const country: string | undefined = undefined;
     const additionalNamespaces: NamespaceSource[] = []; // actually all strings
